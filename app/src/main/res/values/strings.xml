@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">L Tweaks</string>
+    <string name="app_name">WY Tweaks Beta</string>
     <string name="app_summary">Little tweaks for Android apps, if you like it, then use it</string>
     <string name="app_about">About</string>
     <string name="app_about_summary">
@@ -47,6 +47,7 @@ Open source on github: \n
     <string name="pref_header_shopping">Shopping</string>
     <string name="pref_category_jd">JD</string>
     <string name="pref_jd_open_link_in_app">Open link in app</string>
+    <string name="pref_jd_sign_in_auto">Auto Sign in</string>
     <string name="pref_jd_open_link_in_app_summary">eg. http://item.jd.com/123.html</string>
     <string name="pref_jd_share_item">Share product by \"System Share\"</string>
     <string name="pref_jd_share_item_summary">Use \"Copy To Clipboard\" in app share menu, a button will appear for you</string>

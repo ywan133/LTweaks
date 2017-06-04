@@ -6,6 +6,13 @@
             android:key="@string/key_jd_open_link_in_app"
             android:title="@string/pref_jd_open_link_in_app"
             android:summary="@string/pref_jd_open_link_in_app_summary" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_jd_sign_in_auto"
+            android:title="@string/pref_jd_sign_in_auto"
+            android:summary="wy_null_val" />
+
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/key_jd_share_item"

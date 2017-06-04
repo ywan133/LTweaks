@@ -13,6 +13,8 @@ public class XposedJdShareClip extends XposedShareClip {
     private static final String ITEM_ACTIVITY = "com.jd.lib.productdetail.ProductDetailActivity";
     private static final String SHARE_ACTIVITY = "com.jingdong.app.mall.basic.ShareActivity";
 
+
+
     @Override
     protected String getItemActivity() {
         return ITEM_ACTIVITY;
@@ -22,4 +24,7 @@ public class XposedJdShareClip extends XposedShareClip {
     protected String getShareActivity() {
         return SHARE_ACTIVITY;
     }
+
+
+
 }

@@ -18,14 +18,26 @@ public abstract class XposedShareClip extends XposedBase {
     private Activity mActivity;
     private boolean mIsSharing = false;
 
+    private static final String MAIN_ACTIVITY = "com.jingdong.app.mall.main.MainActivity";
+
     @Override
     protected void handleLoadPackage() throws Throwable {
+
+
+
+
+
+
         findAndHookMethod(ClipboardManager.class, "setPrimaryClip", ClipData.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.toast_i(mActivity, "正在 hook: setPrimaryClip:");
                 if (isSharing() && mActivity != null) {
                     Logger.i("ClipboardManager setPrimaryClip " + param.args[0]);
                     ClipData clipData = (ClipData) param.args[0];
+
+                    Logger.toast_i(mActivity, "setPrimaryClip:" + clipData);
+
                     ShareUtils.shareClipWithSnackbar(mActivity, clipData);
                 }
             }
@@ -36,6 +48,7 @@ public abstract class XposedShareClip extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.i("Item activity onResume.");
                 mActivity = (Activity) param.thisObject;
+                 Logger.toast_i(mActivity, "ProductDetailActivity: resume");
             }
         });
 
@@ -43,9 +56,12 @@ public abstract class XposedShareClip extends XposedBase {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.i("Item activity onStop.");
+                 Logger.toast_i(mActivity, "ProductDetailActivity: stop");
                 mActivity = null;
             }
         });
+
+
 
         if (getShareActivity() != null) {
             findAndHookActivity(getShareActivity(), "onResume", new XC_MethodHook() {
@@ -53,6 +69,7 @@ public abstract class XposedShareClip extends XposedBase {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.i("Share activity onResume.");
                     mIsSharing = true;
+                     Logger.toast_i(mActivity, "ShareActivity: share act resume");
                 }
             });
 
@@ -61,6 +78,7 @@ public abstract class XposedShareClip extends XposedBase {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.i("Share activity onPause.");
                     mIsSharing = false;
+                     Logger.toast_i(mActivity, "ShareActivity: share act pause");
                 }
             });
         }

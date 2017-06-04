@@ -1,6 +1,8 @@
 package li.lingfeng.ltweaks.utils;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import li.lingfeng.ltweaks.BuildConfig;
 
@@ -8,7 +10,7 @@ import li.lingfeng.ltweaks.BuildConfig;
  * Created by smallville on 2016/11/23.
  */
 public class Logger {
-    private final static String TAG = "Xposed";
+    private final static String TAG = "WY: Xposed";
 
     public static void v(String msg) {
         if (BuildConfig.DEBUG)
@@ -34,5 +36,9 @@ public class Logger {
 
     public static void stackTrace(Throwable e) {
         Log.e(TAG, Log.getStackTraceString(e));
+    }
+
+    public static void toast_i(Activity activity, String s){
+        Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
     }
 }

@@ -16,6 +16,9 @@ public class ShareUtils {
         final String text = clipData.getItemCount() > 0 ? clipData.getItemAt(0).getText().toString() : "";
         if (text.isEmpty())
             return;
+
+        // Logger.toast_i(activity, "这里是 ShareUtils");
+
         SimpleSnackbar.make(activity, "你可以分享复制的内容", SimpleSnackbar.LENGTH_LONG)
                 .setAction("分享...", new View.OnClickListener() {
                     @Override

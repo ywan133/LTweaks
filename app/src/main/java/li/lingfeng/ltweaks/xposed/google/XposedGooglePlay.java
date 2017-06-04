@@ -60,8 +60,12 @@ public class XposedGooglePlay extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
                 Menu menu = (Menu) param.args[0];
-                itemCoolApk = menu.add("View in CoolApk");
-                itemApkPure = menu.add("View in ApkPure");
+
+                // 可以设置 id,
+                // goupId, 暂时没有用到
+                // order,  暂时也没有用到
+                itemCoolApk = menu.add(0, 12345, 0, "View in CoolApk(WY)");
+                itemApkPure = menu.add("View in ApkPure(WY)");
                 markets = new HashMap<MenuItem, String>(2) {{
                     put(itemCoolApk, PackageNames.COOLAPK);
                     put(itemApkPure, PackageNames.APKPURE);
@@ -82,6 +86,9 @@ public class XposedGooglePlay extends XposedBase {
                 Activity activity = (Activity) param.thisObject;
                 try {
                     Logger.i("Menu is clicked .");
+                    Logger.toast_i(activity, "Menu is clicked...");
+                    // Logger.toast_i(activity, "cool id:" + itemCoolApk.getItemId());
+
                     Object navigationMgr = fNavigationMgr.get(param.thisObject);
                     Object doc = mGetCurrentDoc.invoke(navigationMgr);
 

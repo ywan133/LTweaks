@@ -58,6 +58,7 @@ public abstract class Xposed implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+
         if (isEmptyModules()) {
             addModules();
             addModulePrefs();
@@ -68,6 +69,23 @@ public abstract class Xposed implements IXposedHookLoadPackage {
             return;
         }
 
+        try {
+            Logger.i("========================");
+            Logger.i(lpparam.packageName);
+            // Logger.i(lpparam.processName);
+            // Logger.i(lpparam.appInfo.toString());
+            // Logger.i(lpparam.isFirstApplication + "");
+            Logger.i(modules.toString());
+            Logger.i(modules.size() + "");
+
+            Logger.i("========================");
+        } catch (Throwable throwable) {
+            Logger.e("Can't print, " + throwable.getMessage());
+            throwable.printStackTrace();
+        }
+
+
+
         for (Class<?> cls : modules) {
             try {
                 List<String> enabledPrefs = new ArrayList<>();
@@ -76,6 +94,9 @@ public abstract class Xposed implements IXposedHookLoadPackage {
                         enabledPrefs.add(pref);
                     }
                 }
+
+                Logger.i("enabledPrefs:" + enabledPrefs.size());
+                Logger.i("enabledPrefs:" + enabledPrefs.toString());
 
                 if (enabledPrefs.size() > 0) {
                     IXposedHookLoadPackage module = (IXposedHookLoadPackage) cls.newInstance();
