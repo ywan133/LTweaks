@@ -18,7 +18,7 @@ public abstract class XposedShareClip extends XposedBase {
     private Activity mActivity;
     private boolean mIsSharing = false;
 
-    private static final String MAIN_ACTIVITY = "com.jingdong.app.mall.main.MainActivity";
+
 
     @Override
     protected void handleLoadPackage() throws Throwable {

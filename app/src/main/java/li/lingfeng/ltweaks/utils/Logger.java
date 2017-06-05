@@ -41,4 +41,7 @@ public class Logger {
     public static void toast_i(Activity activity, String s){
         Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
     }
+    public static void toast_i_long(Activity activity, String s){
+        Toast.makeText(activity, s, Toast.LENGTH_LONG).show();
+    }
 }

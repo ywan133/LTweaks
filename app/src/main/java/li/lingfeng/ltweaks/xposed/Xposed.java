@@ -95,8 +95,8 @@ public abstract class Xposed implements IXposedHookLoadPackage {
                     }
                 }
 
-                Logger.i("enabledPrefs:" + enabledPrefs.size());
-                Logger.i("enabledPrefs:" + enabledPrefs.toString());
+                // Logger.i("enabledPrefs:" + enabledPrefs.size());
+                // Logger.i("enabledPrefs:" + enabledPrefs.toString());
 
                 if (enabledPrefs.size() > 0) {
                     IXposedHookLoadPackage module = (IXposedHookLoadPackage) cls.newInstance();

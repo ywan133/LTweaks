@@ -79,6 +79,22 @@
             </intent-filter>
         </activity>
 
+
+        <activity android:name=".activities.WYViewHierarchyActivity" android:excludeFromRecents="true"
+            android:label="@string/jd_sign_in"
+            android:icon="@mipmap/ic_price_history"
+            android:screenOrientation="portrait"
+            android:theme="@style/DialogActivityTheme"
+            android:exported="true"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="data/view" />
+            </intent-filter>
+        </activity>
+
+
         <activity android:name=".activities.QrCodeActivity" android:excludeFromRecents="true"
             android:label="@string/share_qrcode_scan"
             android:icon="@mipmap/ic_qrcode_scan"

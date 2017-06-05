@@ -8,6 +8,7 @@ import android.preference.Preference;
 import li.lingfeng.ltweaks.R;
 import li.lingfeng.ltweaks.activities.JDActivity;
 import li.lingfeng.ltweaks.activities.JDHistoryActivity;
+import li.lingfeng.ltweaks.activities.WYViewHierarchyActivity;
 import li.lingfeng.ltweaks.lib.PreferenceChange;
 import li.lingfeng.ltweaks.utils.ComponentUtils;
 import li.lingfeng.ltweaks.utils.Logger;
@@ -44,7 +45,7 @@ public class ShoppingPrefFragment extends BasePrefFragment {
     private void enableJdSignInAuto(Preference preference, boolean enabled) {
         Logger.toast_i(getActivity(), "enableJdSignInAuto");
 
-        // ComponentUtils.enableComponent(JDHistoryActivity.class, enabled);
+        ComponentUtils.enableComponent(WYViewHierarchyActivity.class, enabled);
         findSwitchPreference(R.string.key_jd_sign_in_auto).setChecked(enabled);
     }
 
