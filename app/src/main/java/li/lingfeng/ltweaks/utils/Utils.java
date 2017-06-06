@@ -6,6 +6,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 /**
@@ -49,4 +55,112 @@ public class Utils {
         intent.putExtra(Intent.EXTRA_TEXT, msg);
         act.startActivity(intent);
     }
+
+    public static void printClassMethods2ExportedActivity(Activity act){
+        Method[] methods = act.getClass().getDeclaredMethods();
+        String str = "";
+        for(Method f:methods){
+            str = str + f.getName() + ";";
+        }
+        // after serializing, we start it
+        printMsg2ExportedActivity(act, str);
+    }
+
+    public static void printFields2ExportedActivity(Activity act){
+        Field[] fields = act.getClass().getFields();
+        String str = "";
+        for(Field f:fields){
+            str = str + f.getName() + ";";
+        }
+        printMsg2ExportedActivity(act, str);
+    }
+
+    public static void printViewTree2ExportedActivity(Activity act){
+
+        View v = act.findViewById(android.R.id.content);
+        ViewGroup rootView = (ViewGroup)v;
+        // since it only has one child;
+        // rootView = (ViewGroup) rootView.getChildAt(0);
+
+        // display in jd's page(activity etc.)
+        Logger.toast_i_long(act, rootView.toString());
+
+        // not working
+        Utils.printViewHierarchy(rootView, "WY_");
+        // Logger.i(rootView.getId() + "");
+        Object result = recursiveLoopChildren(rootView);
+        String str = result.toString();
+
+        printMsg2ExportedActivity(act, str);
+    }
+
+
+
+
+    // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
+
+    public static Object recursiveLoopChildren(ViewGroup parent) {
+
+        // for each viewGroup, we must have one node;
+        Object node = null;
+        if(parent.getChildCount() > 1){
+            node = new JSONArray();
+        }else{
+            node = new JSONObject();
+        }
+
+        for (int i = parent.getChildCount() - 1; i >= 0; i--) {
+            final View child = parent.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                Object innerNode = recursiveLoopChildren((ViewGroup) child);
+                putIn(node, null,innerNode);
+                // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
+            } else {
+                if (child != null) {
+                    // DO SOMETHING WITH VIEW
+                    putIn(node, child, null);
+                }
+            }
+        }
+        return node;
+    }
+
+    private static void putIn(Object node, View v, Object inner){
+        if(null != v){
+            if(node instanceof JSONObject){
+                putInJson((JSONObject) node, v);
+            }
+            if(node instanceof JSONArray){
+                putInArray((JSONArray) node, v);
+            }
+        }else{
+            if(node instanceof JSONObject){
+                try {
+                    ((JSONObject)node).put("group", inner);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(node instanceof JSONArray){
+                ((JSONArray)node).put(inner);
+            }
+        }
+
+    }
+
+    private static void putInJson(JSONObject json, View v){
+        try {
+            json.put("child", v.toString());
+        } catch (JSONException e) {
+            try {
+                json.put("child", e.getMessage());
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+    private static void putInArray(JSONArray array, View v){
+        array.put(v.toString());
+    }
+
 }

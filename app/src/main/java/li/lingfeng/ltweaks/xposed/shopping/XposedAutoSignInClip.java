@@ -53,107 +53,16 @@ public class XposedAutoSignInClip extends XposedBase {
                     Logger.i(m);
                     Logger.w(m);
 
-
-
-                    View v = mActivity.findViewById(android.R.id.content);
-                    ViewGroup rootView = (ViewGroup)v;
-                    // since it only has one child;
-                    rootView = (ViewGroup) rootView.getChildAt(0);
-
-                    Logger.toast_i_long(mActivity, rootView.toString());
-
-                    // Utils.printViewHierarchy(rootView, "WY_");
-                    // Logger.i(rootView.getId() + "");
-
-//                    Object result = recursiveLoopChildren(rootView);
-//                    String str = result.toString();
-
-
-
-                    // Field[] fields = mActivity.getClass().getFields();
-//                    String str = "";
-//                    for(Field f:fields){
-//                        str = str + f.getName() + ";";
-//                    }
-
-                    Method[] methods = mActivity.getClass().getDeclaredMethods();
-                    String str = "";
-                    for(Method f:methods){
-                        str = str + f.getName() + ";";
-                    }
-
-                    Utils.printMsg2ExportedActivity(mActivity, str);
+                    // Utils.printClassMethods2ExportedActivity(mActivity);
+                    // Utils.printFields2ExportedActivity(mActivity);
+                    Utils.printViewTree2ExportedActivity(mActivity);
 
                 }catch (Exception e){
                     Logger.e(e.getMessage());
                     Logger.e("MainActivity onResume");
                 }
             }
-            // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
 
-            public Object recursiveLoopChildren(ViewGroup parent) {
-
-                // for each viewGroup, we must have one node;
-                Object node = null;
-                if(parent.getChildCount() > 1){
-                    node = new JSONArray();
-                }else{
-                    node = new JSONObject();
-                }
-
-                for (int i = parent.getChildCount() - 1; i >= 0; i--) {
-                    final View child = parent.getChildAt(i);
-                    if (child instanceof ViewGroup) {
-                        Object innerNode = recursiveLoopChildren((ViewGroup) child);
-                        putIn(node, null,innerNode);
-                        // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
-                    } else {
-                        if (child != null) {
-                            // DO SOMETHING WITH VIEW
-                            putIn(node, child, null);
-                        }
-                    }
-                }
-                return node;
-            }
-
-            private void putIn(Object node, View v, Object inner){
-                if(null != v){
-                    if(node instanceof JSONObject){
-                        putInJson((JSONObject) node, v);
-                    }
-                    if(node instanceof JSONArray){
-                        putInArray((JSONArray) node, v);
-                    }
-                }else{
-                    if(node instanceof JSONObject){
-                        try {
-                            ((JSONObject)node).put("group", inner);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if(node instanceof JSONArray){
-                        ((JSONArray)node).put(inner);
-                    }
-                }
-
-            }
-
-            private void putInJson(JSONObject json, View v){
-                try {
-                    json.put("child", v.toString());
-                } catch (JSONException e) {
-                    try {
-                        json.put("child", e.getMessage());
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-            private void putInArray(JSONArray array, View v){
-                array.put(v.toString());
-            }
 
         });
     }
