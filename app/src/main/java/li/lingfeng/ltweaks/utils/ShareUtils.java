@@ -17,7 +17,8 @@ public class ShareUtils {
         if (text.isEmpty())
             return;
 
-        // Logger.toast_i(activity, "这里是 ShareUtils");
+        // 这是啥
+        Logger.toast_i(activity, text);
 
         SimpleSnackbar.make(activity, "你可以分享复制的内容", SimpleSnackbar.LENGTH_LONG)
                 .setAction("分享...", new View.OnClickListener() {

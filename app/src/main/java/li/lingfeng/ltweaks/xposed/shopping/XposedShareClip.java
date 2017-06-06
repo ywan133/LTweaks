@@ -3,6 +3,9 @@ package li.lingfeng.ltweaks.xposed.shopping;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Intent;
+
+import java.lang.reflect.Field;
 
 import de.robv.android.xposed.XC_MethodHook;
 import li.lingfeng.ltweaks.utils.Logger;
@@ -31,12 +34,10 @@ public abstract class XposedShareClip extends XposedBase {
         findAndHookMethod(ClipboardManager.class, "setPrimaryClip", ClipData.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.toast_i(mActivity, "正在 hook: setPrimaryClip:");
-                if (isSharing() && mActivity != null) {
-                    Logger.i("ClipboardManager setPrimaryClip " + param.args[0]);
-                    ClipData clipData = (ClipData) param.args[0];
 
-                    Logger.toast_i(mActivity, "setPrimaryClip:" + clipData);
+                if (isSharing() && mActivity != null) {
+                    Logger.i("ClipboardManager setPrimaryClip" + param.args[0]);
+                    ClipData clipData = (ClipData) param.args[0];
 
                     ShareUtils.shareClipWithSnackbar(mActivity, clipData);
                 }
@@ -46,17 +47,55 @@ public abstract class XposedShareClip extends XposedBase {
         findAndHookActivity(getItemActivity(), "onResume", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.i("Item activity onResume.");
                 mActivity = (Activity) param.thisObject;
-                 Logger.toast_i(mActivity, "ProductDetailActivity: resume");
+
+                Intent intent = mActivity.getIntent();
+
+
+                String foundProductId = "";
+                if(null != intent){
+                    if(null != intent.getExtras()){
+                        foundProductId = intent.getExtras().get("id").toString();
+                        Logger.toast_i(mActivity, "id:" + foundProductId);
+                    }else{
+
+                    }
+                }
+
+                /*
+                Intent _intent = new Intent();
+                _intent.setClassName(
+                        // Your app's package name
+                        "li.lingfeng.ltweaks",
+                        // The full class name of the activity you want to start
+                        "li.lingfeng.ltweaks.activities.WYViewHierarchyActivity");
+                _intent.setType("data/view");
+                _intent.putExtra(Intent.EXTRA_TEXT, intent.getExtras().toString());
+                mActivity.startActivity(_intent);
+                */
+
+                Intent _fuck_intent = new Intent(Intent.ACTION_SEND);
+                _fuck_intent.setType("text/plain");
+                _fuck_intent.putExtra(Intent.EXTRA_TEXT, foundProductId);
+                // mActivity.startActivity(_fuck_intent);
+
+                /*
+                Field[] fields = mActivity.getClass().getFields();
+                String str = "";
+                for(Field f:fields){
+                    str = str + f.getName() + ";";
+                }
+                Logger.toast_i(mActivity, str);
+                */
+
             }
         });
 
         findAndHookActivity(getItemActivity(), "onStop", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.i("Item activity onStop.");
-                 Logger.toast_i(mActivity, "ProductDetailActivity: stop");
+
+                // Logger.toast_i(mActivity, "ProductDetailActivity: stop");
                 mActivity = null;
             }
         });

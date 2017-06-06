@@ -1,5 +1,7 @@
 package li.lingfeng.ltweaks.utils;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,5 +35,18 @@ public class Utils {
                 printViewHierarchy((ViewGroup)v, desc);
             }
         }
+    }
+
+    public static void printMsg2ExportedActivity(Activity act, String msg){
+        Intent intent = new Intent();
+        intent.setClassName(
+                // Your app's package name
+                "li.lingfeng.ltweaks",
+                // The full class name of the activity you want to start
+                "li.lingfeng.ltweaks.activities.WYViewHierarchyActivity");
+        intent.setType("data/view");
+
+        intent.putExtra(Intent.EXTRA_TEXT, msg);
+        act.startActivity(intent);
     }
 }
