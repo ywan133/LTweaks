@@ -56,6 +56,7 @@ public class XposedAutoSignInClip extends XposedBase {
                     // Utils.printClassMethods2ExportedActivity(mActivity);
                     // Utils.printFields2ExportedActivity(mActivity);
                     Utils.printViewTree2ExportedActivity(mActivity);
+                    Utils.sendBroadcast2ExportedActivity(mActivity, "onResume");
 
                 }catch (Exception e){
                     Logger.e(e.getMessage());
@@ -64,6 +65,17 @@ public class XposedAutoSignInClip extends XposedBase {
             }
 
 
+        });
+        findAndHookActivity(MAIN_ACTIVITY, "onDestroy", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                mActivity = (Activity) param.thisObject;
+
+                Utils.sendBroadcast2ExportedActivity(mActivity, "onDestroy");
+
+
+            }
         });
     }
 

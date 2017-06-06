@@ -96,6 +96,13 @@ public class Utils {
 
 
 
+    public static void sendBroadcast2ExportedActivity(Activity act, String msg){
+        Intent intent =new Intent();
+        intent.setAction("com.wy.listen_log");
+        intent.putExtra(Intent.EXTRA_TEXT, msg);
+        act.sendBroadcast(intent);
+    }
+
 
     // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
 

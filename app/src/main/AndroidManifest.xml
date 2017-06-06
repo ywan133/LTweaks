@@ -86,6 +86,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/DialogActivityTheme"
             android:exported="true"
+            android:launchMode="singleTop"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
