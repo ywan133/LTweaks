@@ -8,20 +8,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
 import li.lingfeng.ltweaks.R;
 import li.lingfeng.ltweaks.lib.XposedLoad;
 import li.lingfeng.ltweaks.prefs.PackageNames;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.utils.Utils;
+import li.lingfeng.ltweaks.utils.YWUtilsForMainFrameActivity;
+import li.lingfeng.ltweaks.utils.YWUtilsLogger;
 import li.lingfeng.ltweaks.xposed.XposedBase;
-import okhttp3.internal.Util;
 
 /**
  * Created by yangwan on 04/06/2017.
@@ -53,10 +50,10 @@ public class XposedAutoSignInClip extends XposedBase {
     @Override
     protected void handleLoadPackage() throws Throwable {
 
-        successHook();
-        testHook_JD_MallFloor_Icon();
+        successHook_MainFrameActivity();
+        // testHook_JD_MallFloor_Icon();
         // testHook_JDGridViewInViewPager();
-        testHook_JD_GRID_VIEW_PAGER_GRID_VIEW();
+        // testHook_JD_GRID_VIEW_PAGER_GRID_VIEW();
 
         /*
         // onInterceptTouchEvent
@@ -94,68 +91,17 @@ public class XposedAutoSignInClip extends XposedBase {
 
     }
 
-    private void successHook(){
+    private void successHook_MainFrameActivity(){
         findAndHookActivity(MAIN_FRAME_ACTIVITY, "onResume", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
 
                 mActivity = (Activity) param.thisObject;
-                try{
-                    String m = "MainActivity onResume kkkkkkk";
-                    XposedBridge.log(m);
-                    Logger.e(m);
-                    Logger.v(m);
-                    Logger.i(m);
-                    Logger.w(m);
-
-                    // Utils.printClassMethods2ExportedActivity(mActivity, null);
-                    // Utils.printFields2ExportedActivity(mActivity, null);
-                    // Utils.printViewTree2ExportedActivity(mActivity, null);
-                    // Utils.sendBroadcast2ExportedActivity(mActivity, "onResume");
-                    View v = mActivity.findViewById(android.R.id.content);
-                    recursiveLoopChildren((ViewGroup) v);
-
-                }catch (Exception e){
-                    Logger.e(e.getMessage());
-                    Logger.e("MainActivity onResume");
-                }
+                YWUtilsForMainFrameActivity.hackIt(mActivity);
             }
 
-            private View viewPager = null;
-            private View viewPagerWithGridView = null;
-            private List<View> viewPagerWithGridViews = new ArrayList<View>();
-            public void recursiveLoopChildren(ViewGroup parent) {
-                for (int i = parent.getChildCount() - 1; i >= 0; i--) {
-                    final View child = parent.getChildAt(i);
-                    if (child instanceof ViewGroup) {
-                        recursiveLoopChildren((ViewGroup) child);
-                        // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
 
-                        // Class _class = Class.forName("JDGridViewInViewPager");
-                        // JDGridViewInViewPager
-                        if( child.getClass().getSimpleName().equals("JDGridViewInViewPager") ){
-                            // Logger.toast_i_long(mActivity, "Found JDGridViewInViewPager");
-
-                            // com.jingdong.app.mall.home.floor.view.view.MallFloor_Icon.JDGridViewInViewPager;
-                            // Logger.toast_i_long(mActivity, child.getClass().getCanonicalName());
-                            // Utils.sendBroadcast2ExportedActivity(mActivity, "onResume");
-
-                            viewPager = child;
-                            // printViewItSelf(mActivity, child);
-                        }
-
-                    } else {
-                        if (child != null) {
-                            if( child.getClass().getSimpleName().equals("JDViewPagerWithGridView") ){
-                                viewPagerWithGridViews.add(child);
-                            }
-                            // DO SOMETHING WITH VIEW
-                            find京豆Widget(child, parent);
-                        }
-                    }
-                }
-            }
 
             private void printViewItSelf(Activity act, View child){
 
@@ -209,110 +155,6 @@ public class XposedAutoSignInClip extends XposedBase {
                 Logger.toast_i(mActivity, me.toString());
             }
 
-            private void find京豆Widget(View child, ViewGroup parent){
-                java.lang.reflect.Method method;
-                try {
-                    method = child.getClass().getMethod("getText");
-                    if(null != method){
-                        Object title = method.invoke(child);
-                        if(title instanceof String && title.equals("领京豆")){
-                            // Logger.toast_i_long(mActivity, "Found it: 领京豆");
-                            // Logger.toast_i_long(mActivity, child.toString());
-
-
-
-                            ViewGroup grandParent = (ViewGroup)parent.getParent();
-                            // Logger.toast_i_long(mActivity, grandParent.toString());
-                            // Logger.toast_i_long(mActivity, grandParent.getChildCount() + " children");
-
-                            /*
-                            String names = "";
-                            for(int _i = grandParent.getChildCount() -1; _i >=0; _i--){
-                                final View _child = grandParent.getChildAt(_i);
-                                _child.performClick();
-                                _child.callOnClick();
-
-                                names += _child.getClass().getName() + "|";
-
-                                _child.setBackgroundColor(Color.RED);
-
-                                _child.post(new Runnable(){
-                                    @Override
-                                    public void run() {
-                                        _child.performClick();
-                                        _child.callOnClick();
-                                    }
-                                });
-
-
-                                Utils.performTouchOn(_child, parent, mActivity);
-
-
-
-                            }
-                            */
-
-                            Logger.toast_i(mActivity, "touched:" + viewPager);
-                            Utils.performTouchOn(child, viewPager, mActivity);
-
-                            for (View v: viewPagerWithGridViews){
-                                Utils.performTouchOn(child, v, mActivity);
-                            }
-
-
-                            // Logger.toast_i_long(mActivity, names);
-
-                                        /*
-                                        child.callOnClick();
-                                        child.performClick();
-
-                                        parent.callOnClick();
-                                        parent.performClick();
-
-                                        // Logger.toast_i_long(mActivity, parent.getChildCount() + " children");
-
-                                        String names = "";
-                                        for(int _i = parent.getChildCount() -1; _i >=0; _i--){
-                                            final View _child = parent.getChildAt(i);
-                                            _child.performClick();
-                                            _child.callOnClick();
-
-                                            int redColorValue = Color.RED;
-                                            _child.setBackgroundColor(redColorValue);
-
-                                            names += _child.getClass().getName() + "|";
-
-                                            _child.post(new Runnable(){
-                                                @Override
-                                                public void run() {
-                                                    _child.performClick();
-                                                    _child.callOnClick();
-                                                }
-                                            });
-                                        }
-                                        Logger.toast_i_long(mActivity, names);
-                                        */
-
-
-                        }
-                        if(title instanceof String &&
-                                (title.equals("生鲜") || title.equals("京东到家") || title.equals("服装城"))){
-                            // child.setVisibility(View.INVISIBLE);
-                            child.setAlpha(0.2f);
-                            parent.setAlpha(0.2f);
-                        }
-                    }
-                } catch (SecurityException e) {
-
-                } catch (NoSuchMethodException e) {
-
-                } catch (InvocationTargetException e) {
-
-                } catch (IllegalAccessException e) {
-
-                }
-
-            }
 
 
         });
@@ -320,15 +162,12 @@ public class XposedAutoSignInClip extends XposedBase {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
-                mActivity = (Activity) param.thisObject;
-
-                // Utils.sendBroadcast2ExportedActivity(mActivity, "onDestroy");
-
-
+                mActivity = null;
             }
         });
     }
 
+    // 成功了, 但并无用处, 可以拿到它的坐标, 还没有尝试是否能成功
     private void testHook_JD_GRID_VIEW_PAGER_GRID_VIEW(){
         hookAllMethods(JD_GRID_VIEW_PAGER_GRID_VIEW, "onTouchEvent", new XC_MethodHook(){
             @Override
@@ -338,12 +177,13 @@ public class XposedAutoSignInClip extends XposedBase {
 
                 String msg = current.toString() + Arrays.toString(param.args);
                 // Logger.toast_i_long(mActivity, msg);
-                Utils.printMsg2ExportedActivity(mActivity, msg);
+                YWUtilsLogger.printMsg2ExportedActivity(mActivity, msg);
             }
         });
     }
 
     // not work...
+    // please try again
     private void testHook_JDGridViewInViewPager(){
         hookAllMethods(JD_GRID_VIEW_PAGER, "setAdapter", new XC_MethodHook() {
             @Override
@@ -352,12 +192,12 @@ public class XposedAutoSignInClip extends XposedBase {
                 Object current = param.thisObject;
 
                 Logger.toast_i_long(mActivity, current.toString() + Arrays.toString(param.args));
-
-
             }
         });
     }
 
+    // createGridView成功了,
+    // constructors也是成功的,
     private void testHook_JD_MallFloor_Icon(){
         // JD_ICON_VIEW_PAGER_ADAPTER, "addView", android.view.View.class
         hookAllConstructors(JD_MallFloor_Icon,  new XC_MethodHook() {
@@ -398,6 +238,14 @@ public class XposedAutoSignInClip extends XposedBase {
                 // Object result = Utils.invokeMeth(adapter, "getItem", 1);// null
                 // Utils.printMsg2ExportedActivity(mActivity, adapter.getClass().getCanonicalName());
                 //Utils.printClassMethods2ExportedActivity(mActivity, result);
+            }
+        });
+
+        hookAllMethods(JD_MallFloor_Icon, "onAllIconLoaded", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                Logger.toast_i(mActivity, "onAllIconLoaded");
             }
         });
     }
