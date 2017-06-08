@@ -5,6 +5,7 @@ import android.app.Application;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Set;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -94,7 +95,11 @@ public abstract class XposedBase implements IXposedHookLoadPackage {
                 clsActivity.getDeclaredMethod(methodName, parameterTypes);
                 Logger.v("Hook " + className + " " + methodName);
                 return findAndHookMethod(clsActivity, methodName, parameterTypesAndCallback);
-            } catch (Throwable e) {}
+            } catch (Throwable e) {
+//                Logger.e("Hook Err: " + className + " " + methodName);
+//                Logger.e("Hook Err: " + e.getMessage());
+//                Logger.e("Hook Err: " + Arrays.toString(e.getStackTrace()));
+            }
 
             // If method is not override by extended activity, hook android.app.Activity.
             final XC_MethodHook hook = (XC_MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length - 1];

@@ -9,8 +9,14 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 
@@ -74,9 +80,21 @@ public class WYViewHierarchyActivity extends AppCompatActivity {
             Logger.e(result);
 
             TextView tv = (TextView) findViewById(R.id.sh_wy_display_log);
-            String str =  tv.getText().toString();
-            String display =str + result;
-            tv.setText(display);
+
+            try{
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonParser jp = new JsonParser();
+                JsonElement je = jp.parse(result);
+                String prettyJsonString = gson.toJson(je);
+                Logger.i(prettyJsonString);
+                tv.setText(prettyJsonString);
+            }catch(Exception e){
+                e.printStackTrace();
+                tv.setText(result);
+            }
+
+
+
 
         }catch (Exception e){
             e.printStackTrace();

@@ -3,6 +3,7 @@ package li.lingfeng.ltweaks.xposed;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +108,9 @@ public abstract class Xposed implements IXposedHookLoadPackage {
                 }
             } catch (Throwable throwable) {
                 Logger.e("Can't handleLoadPackage, " + throwable.getMessage());
+                // Logger.e("Can't handleLoadPackage,2 " + throwable.getCause().toString());
+                Logger.e("Can't handleLoadPackage,3 " + Arrays.toString(throwable.getStackTrace()));
+                // Logger.toast_i_long(throwable.getCause().toString());
                 throwable.printStackTrace();
             }
         }

@@ -2,15 +2,22 @@ package li.lingfeng.ltweaks.utils;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
@@ -56,8 +63,11 @@ public class Utils {
         act.startActivity(intent);
     }
 
-    public static void printClassMethods2ExportedActivity(Activity act){
-        Method[] methods = act.getClass().getDeclaredMethods();
+    public static void printClassMethods2ExportedActivity(Activity act, Object target){
+        if(null == target){
+            target = act;
+        }
+        Method[] methods = target.getClass().getDeclaredMethods();
         String str = "";
         for(Method f:methods){
             str = str + f.getName() + ";";
@@ -66,8 +76,11 @@ public class Utils {
         printMsg2ExportedActivity(act, str);
     }
 
-    public static void printFields2ExportedActivity(Activity act){
-        Field[] fields = act.getClass().getFields();
+    public static void printFields2ExportedActivity(Activity act, Object target){
+        if(null == target){
+            target = act;
+        }
+        Field[] fields = target.getClass().getFields();
         String str = "";
         for(Field f:fields){
             str = str + f.getName() + ";";
@@ -75,23 +88,27 @@ public class Utils {
         printMsg2ExportedActivity(act, str);
     }
 
-    public static void printViewTree2ExportedActivity(Activity act){
 
-        View v = act.findViewById(android.R.id.content);
-        ViewGroup rootView = (ViewGroup)v;
+
+    public static void printViewTree2ExportedActivity(Activity act, ViewGroup view){
+
+        if(null == view){
+            view = (ViewGroup) act.findViewById(android.R.id.content);
+        }
+
         // since it only has one child;
         // rootView = (ViewGroup) rootView.getChildAt(0);
 
         // display in jd's page(activity etc.)
-        Logger.toast_i_long(act, rootView.toString());
+         Logger.toast_i_long(act, view.toString());
 
         // not working
-        Utils.printViewHierarchy(rootView, "WY_");
+        Utils.printViewHierarchy(view, "WY_");
         // Logger.i(rootView.getId() + "");
-        Object result = recursiveLoopChildren(rootView);
+        Object result = recursiveLoopChildren(view);
         String str = result.toString();
 
-        printMsg2ExportedActivity(act, str);
+        // printMsg2ExportedActivity(act, str);
     }
 
 
@@ -102,6 +119,7 @@ public class Utils {
         intent.putExtra(Intent.EXTRA_TEXT, msg);
         act.sendBroadcast(intent);
     }
+
 
 
     // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
@@ -125,14 +143,23 @@ public class Utils {
             } else {
                 if (child != null) {
                     // DO SOMETHING WITH VIEW
-                    putIn(node, child, null);
+                    // 全部的名字:
+                    // String name = child.getClass().getCanonicalName();
+                    // 简单的名字
+                    String name = child.getClass().getSimpleName();
+
+                    if(child instanceof TextView){
+                        name += ((TextView)child).getText();
+                    }
+
+                    putIn(node, name, null);
                 }
             }
         }
         return node;
     }
 
-    private static void putIn(Object node, View v, Object inner){
+    private static void putIn(Object node, String v, Object inner){
         if(null != v){
             if(node instanceof JSONObject){
                 putInJson((JSONObject) node, v);
@@ -143,7 +170,8 @@ public class Utils {
         }else{
             if(node instanceof JSONObject){
                 try {
-                    ((JSONObject)node).put("group", inner);
+                    String groupName = inner.getClass().getCanonicalName();
+                    ((JSONObject)node).put(groupName, inner);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -155,9 +183,9 @@ public class Utils {
 
     }
 
-    private static void putInJson(JSONObject json, View v){
+    private static void putInJson(JSONObject json, String v){
         try {
-            json.put("child", v.toString());
+            json.put("child", v);
         } catch (JSONException e) {
             try {
                 json.put("child", e.getMessage());
@@ -166,8 +194,68 @@ public class Utils {
             }
         }
     }
-    private static void putInArray(JSONArray array, View v){
+    private static void putInArray(JSONArray array, String v){
         array.put(v.toString());
+    }
+
+    // https://stackoverflow.com/questions/160970/how-do-i-invoke-a-java-method-when-given-the-method-name-as-a-string
+    public static Object invokeMeth(Object obj, String methodName, Object para){
+        java.lang.reflect.Method method = null;
+        try {
+            method = obj.getClass().getMethod(methodName, int.class);
+        } catch (SecurityException e) {
+            Logger.stackTrace(e);
+        }  catch (NoSuchMethodException e) {
+            Logger.stackTrace(e);
+        }
+        try {
+            return method.invoke(obj, para);
+        } catch (IllegalArgumentException e) {
+            Logger.stackTrace(e);
+        } catch (IllegalAccessException e) {
+            Logger.stackTrace(e);
+        } catch (InvocationTargetException e) {
+            Logger.stackTrace(e);
+        }
+        return null;
+
+    }
+
+    // https://stackoverflow.com/questions/14098963/how-to-perform-ontouch-event-from-code
+    public static void performTouchOn(View target, View parent, Activity act){
+        int[] coords = new int[2];
+        target.getLocationOnScreen(coords);
+        int x = coords[0];
+        int y = coords[1];
+
+
+        // Obtain MotionEvent object
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis() + 100;
+
+
+        // List of meta states found here: developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+        int metaState = 0;
+        MotionEvent motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.TOOL_TYPE_FINGER,
+                x,
+                y,
+                metaState
+        );
+        // Dispatch touch event to view
+        if(null != target){
+            target.dispatchTouchEvent(motionEvent);
+        }
+        if(null != parent){
+            parent.dispatchTouchEvent(motionEvent);
+        }
+        if(null != act) {
+            act.dispatchTouchEvent(motionEvent);
+        }
+
+
     }
 
 }
