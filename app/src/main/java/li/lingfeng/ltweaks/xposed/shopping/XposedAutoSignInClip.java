@@ -51,7 +51,7 @@ public class XposedAutoSignInClip extends XposedBase {
     protected void handleLoadPackage() throws Throwable {
 
         successHook_MainFrameActivity();
-        // testHook_JD_MallFloor_Icon();
+        testHook_JD_MallFloor_Icon();
         // testHook_JDGridViewInViewPager();
         // testHook_JD_GRID_VIEW_PAGER_GRID_VIEW();
 
@@ -99,6 +99,7 @@ public class XposedAutoSignInClip extends XposedBase {
 
                 mActivity = (Activity) param.thisObject;
                 YWUtilsForMainFrameActivity.hackIt(mActivity);
+                YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
             }
 
 
@@ -226,7 +227,7 @@ public class XposedAutoSignInClip extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
 
-                Object current = param.thisObject;
+                mallFloor_Icon = param.thisObject;
 
 
                 // Logger.toast_i(mActivity, "createGridView...");
@@ -241,11 +242,34 @@ public class XposedAutoSignInClip extends XposedBase {
             }
         });
 
-        hookAllMethods(JD_MallFloor_Icon, "onAllIconLoaded", new XC_MethodHook() {
+        // onAllIconLoaded
+        // onLayout
+        hookAllMethods(JD_MallFloor_Icon, "onLayout", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
-                Logger.toast_i(mActivity, "onAllIconLoaded");
+                mallFloor_Icon = param.thisObject;
+                // Logger.toast_i(mActivity, "onLayout");
+                YWUtilsForMainFrameActivity.hackIt(mActivity);
+
+                YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
+
+            }
+        });
+        hookAllMethods(JD_MallFloor_Icon, "onIconItemClick", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                Logger.toast_i_long(mActivity, String.valueOf(param.args[0]) + "|" + param.args[1]);
+
+
+            }
+        });
+        hookAllMethods(JD_MallFloor_Icon, "access$000", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                Logger.toast_i(mActivity, "access$000");
             }
         });
     }
