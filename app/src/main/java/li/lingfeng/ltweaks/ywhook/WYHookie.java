@@ -48,11 +48,12 @@ public class WYHookie {
             if(runOnResumeHookTimes > 0){
                 recursiveLoopChildren(rootView);
                 runOnResumeHookTimes--;
+                invokeClick();
             }
             if(0 == runOnResumeHookTimes){
                 Logger.toast_i(activity, "onResume 次数用完");
             }
-            invokeClick();
+
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
@@ -65,11 +66,12 @@ public class WYHookie {
             if(runOnLayoutHookTimes > 0){
                 recursiveLoopChildren(rootView);
                 runOnLayoutHookTimes--;
+                invokeClick();
             }
             if(0 == runOnLayoutHookTimes){
                 Logger.toast_i(activity, "onLayout 次数用完");
             }
-            invokeClick();
+
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
