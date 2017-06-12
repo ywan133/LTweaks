@@ -1,8 +1,13 @@
 package li.lingfeng.ltweaks.ywhook;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.SystemClock;
+import android.support.v4.view.InputDeviceCompat;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -19,8 +24,10 @@ public class WYHookie {
     private ViewGroup rootView;
 
     // 用来防止其 卡顿
-    private int runOnResumeHookTimes = 3;
+    private int runOnResumeHookTimes = 1;
     private int runOnLayoutHookTimes = 3;
+    private boolean runInvokeAlready = false;
+    private boolean runAlphaAlready = false;
 
     private RelativeLayout tmp京豆RelativeLayout = null;
 
@@ -46,30 +53,51 @@ public class WYHookie {
         try{
 
             if(runOnResumeHookTimes > 0){
-                recursiveLoopChildren(rootView);
+                // 只添加一次即可
+                rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                    @Override
+                    public void onGlobalLayout() {
+                        runOnlyOncePerAppStart();
+                        invokeClick();
+                    }
+                });
+
                 runOnResumeHookTimes--;
-                invokeClick();
             }
             if(0 == runOnResumeHookTimes){
-                Logger.toast_i(activity, "onResume 次数用完");
+                // Logger.toast_i(activity, "onResume 次数用完");
             }
 
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
+    }
 
+    private void runOnlyOncePerAppStart(){
+        if(null == rootView){
+            return;
+        }
+        if(runAlphaAlready){
+            return;
+        }
+        if(null != tmp京豆RelativeLayout){
+            return;
+        }
+        // 寻找 一次 只是
+        recursiveLoopChildren(rootView);
     }
 
     public void hookOnLayout(){
         try{
 
             if(runOnLayoutHookTimes > 0){
-                recursiveLoopChildren(rootView);
+                // recursiveLoopChildren(rootView);
                 runOnLayoutHookTimes--;
-                invokeClick();
+                // invokeClick();
             }
             if(0 == runOnLayoutHookTimes){
-                Logger.toast_i(activity, "onLayout 次数用完");
+                // Logger.toast_i(activity, "onLayout 次数用完");
             }
 
         }catch (Throwable t){
@@ -121,6 +149,9 @@ public class WYHookie {
 
     // funny, er...
     private void findAndHideWidgets(View child, ViewGroup parent){
+        if(runAlphaAlready){
+            return;
+        }
         Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
         if(null == title) return;
         if(title instanceof String &&
@@ -128,24 +159,30 @@ public class WYHookie {
                         title.equals("京东超市") ||
                         title.equals("京东到家") ||
                         title.equals("服装城") ||
-                        title.equals("全球购"))){
-            // child.setVisibility(View.INVISIBLE);
-            changeAlpha2Low(child, parent);
-        }
-        if(title instanceof String &&
-                (title.equals("二手清仓") ||
+                        title.equals("全球购") ||
+                        // another page...
+                        title.equals("二手清仓") ||
                         title.equals("沃尔玛") ||
                         title.equals("司法拍卖") ||
                         title.equals("机票火车票") ||
                         title.equals("物流查询") ||
-                        title.equals("京东智能"))){
+                        title.equals("京东智能")
+                )){
+            // child.setVisibility(View.INVISIBLE);
             changeAlpha2Low(child, parent);
+            runAlphaAlready = true;
         }
 
     }
 
     // 并没有成功...唉
     private void find京豆Widget(View child, ViewGroup parent){
+
+        // since it has been found
+        // we just ignored
+        if(null != tmp京豆RelativeLayout){
+            return;
+        }
 
         Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
         if(null == title) return;
@@ -224,6 +261,10 @@ public class WYHookie {
     }
 
     private void invokeClick(){
+        if(runInvokeAlready){
+            return;
+        }
+
         if(null == tmp京豆RelativeLayout){
             // Logger.toast_i(mActivity, "tmp 无");
             return;
@@ -232,15 +273,69 @@ public class WYHookie {
             // Logger.toast_i(mActivity, "tmp 无");
             return;
         }
-        Logger.toast_i(activity, "tmp 都有了!");
+        // Logger.toast_i(activity, "tmp 都有了!");
 
-
+        runInvokeAlready = true;
         YWUtilsForMainFrameActivity.invokeClickTmp(
                 XposedAutoSignInClip.mallFloor_Icon,
                 "onIconItemClick",
-                tmp京豆RelativeLayout, 5,
+                tmp京豆RelativeLayout, 6,
                 activity);
 
+
+    }
+
+
+    private void printViewItSelf(Activity act, View child){
+
+        // Utils.printFields2ExportedActivity(act, child);
+
+        String msg = child.getClass().getCanonicalName() + "|";
+        msg += child.getClass().getName() + "|";
+        msg += child.getClass().getSimpleName() + "|";
+        // Utils.printMsg2ExportedActivity(mActivity, msg);
+        // Utils.printClassMethods2ExportedActivity(mActivity, child);
+        // Utils.printViewTree2ExportedActivity(act, (ViewGroup) child);
+        child.setBackgroundColor(Color.RED);
+
+        // result: yes
+        // boolean isClickable = child.isClickable();
+        // Logger.toast_i_long(act, "pager: clickable: " + isClickable);
+
+        child.performClick();
+        child.callOnClick();
+    }
+
+    private void failed2CallTouchEvent(View child){
+
+        long temT = SystemClock.uptimeMillis();
+        long temT2 = SystemClock.uptimeMillis() + 100;
+        float x = 0.0f;
+        float y = 0.0f;
+        MotionEvent me = MotionEvent.obtain(temT,temT2, MotionEvent.ACTION_DOWN, x, y, 0);
+
+
+
+        long when = SystemClock.uptimeMillis();
+        int source = InputDeviceCompat.SOURCE_TOUCHSCREEN;
+        float pressure = 1.0f;
+        int action = 0;
+        MotionEvent event = MotionEvent.obtain(when, when, action, x, y, pressure, 1.0f, 0, 1.0f, 1.0f, 0, 0);
+        event.setSource(source);
+        me = event;
+
+
+        child.dispatchTouchEvent(me);
+        child.onTouchEvent(me);
+        ((ViewGroup) child).onInterceptTouchEvent(me);
+
+        activity.dispatchTouchEvent(me);
+        activity.onTouchEvent(me);
+
+
+
+
+        Logger.toast_i(activity, me.toString());
     }
 
 

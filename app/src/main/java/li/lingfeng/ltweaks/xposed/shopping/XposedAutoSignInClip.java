@@ -85,57 +85,7 @@ public class XposedAutoSignInClip extends XposedBase {
 
 
 
-            private void printViewItSelf(Activity act, View child){
 
-                // Utils.printFields2ExportedActivity(act, child);
-
-                String msg = child.getClass().getCanonicalName() + "|";
-                msg += child.getClass().getName() + "|";
-                msg += child.getClass().getSimpleName() + "|";
-                // Utils.printMsg2ExportedActivity(mActivity, msg);
-                // Utils.printClassMethods2ExportedActivity(mActivity, child);
-                // Utils.printViewTree2ExportedActivity(act, (ViewGroup) child);
-                child.setBackgroundColor(Color.RED);
-
-                // result: yes
-                // boolean isClickable = child.isClickable();
-                // Logger.toast_i_long(act, "pager: clickable: " + isClickable);
-
-                child.performClick();
-                child.callOnClick();
-            }
-
-            private void failed2CallTouchEvent(View child){
-
-                long temT = SystemClock.uptimeMillis();
-                long temT2 = SystemClock.uptimeMillis() + 100;
-                float x = 0.0f;
-                float y = 0.0f;
-                MotionEvent me = MotionEvent.obtain(temT,temT2, MotionEvent.ACTION_DOWN, x, y, 0);
-
-
-
-                long when = SystemClock.uptimeMillis();
-                int source = InputDeviceCompat.SOURCE_TOUCHSCREEN;
-                float pressure = 1.0f;
-                int action = 0;
-                MotionEvent event = MotionEvent.obtain(when, when, action, x, y, pressure, 1.0f, 0, 1.0f, 1.0f, 0, 0);
-                event.setSource(source);
-                me = event;
-
-
-                child.dispatchTouchEvent(me);
-                child.onTouchEvent(me);
-                ((ViewGroup) child).onInterceptTouchEvent(me);
-
-                mActivity.dispatchTouchEvent(me);
-                mActivity.onTouchEvent(me);
-
-
-
-
-                Logger.toast_i(mActivity, me.toString());
-            }
 
 
 
