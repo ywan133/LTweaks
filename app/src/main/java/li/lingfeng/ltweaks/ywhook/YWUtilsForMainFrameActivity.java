@@ -1,14 +1,15 @@
-package li.lingfeng.ltweaks.utils;
+package li.lingfeng.ltweaks.ywhook;
 
 import android.app.Activity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import li.lingfeng.ltweaks.utils.Logger;
 
 /**
  * Created by yangwan on 08/06/2017.
@@ -23,14 +24,14 @@ public class YWUtilsForMainFrameActivity {
     private static RelativeLayout tmp京豆;
 
 
-
+    @Deprecated
     public static void invokeIt(Activity mActivity, Object mallFloor_Icon){
         if(null == YWUtilsForMainFrameActivity.tmp京豆){
             // Logger.toast_i(mActivity, "tmp 无");
             return;
         }
 
-        // Logger.toast_i(mActivity, "tmp 有了!");
+
    
 
         YWUtilsForMainFrameActivity.invokeParamMeth(
@@ -93,6 +94,40 @@ public class YWUtilsForMainFrameActivity {
         try {
             if (method != null) {
                 method.invoke(null, mallFloor_Icon, input_layout, position);
+
+            }else{
+                Logger.toast_i(act, "method null");
+            }
+        } catch (IllegalArgumentException e) {
+            Logger.stackTrace(e);
+        } catch (IllegalAccessException e) {
+            Logger.stackTrace(e);
+        } catch (InvocationTargetException e) {
+            Logger.stackTrace(e);
+        }
+
+    }
+
+    public static void invokeClickTmp(Object obj,
+                                      String methodName,
+                                      RelativeLayout input_layout,
+                                      int position,
+                                      Activity act){
+        java.lang.reflect.Method method = null;
+        try {
+            method = obj.getClass().getDeclaredMethod(methodName, android.view.View.class, int.class);
+            method.setAccessible(true);
+        } catch (SecurityException | NoSuchMethodException e) {
+            Logger.stackTrace(e);
+            try {
+                Logger.toast_i(act, "e:" + e.getCause());
+            }catch (Exception e1){}
+            YWUtilsLogger.printMsg2ExportedActivity(act, Arrays.toString(e.getStackTrace()));
+        }
+
+        try {
+            if (method != null) {
+                method.invoke(obj, input_layout, position);
 
             }else{
                 Logger.toast_i(act, "method null");

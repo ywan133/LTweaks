@@ -15,10 +15,8 @@ import li.lingfeng.ltweaks.R;
 import li.lingfeng.ltweaks.lib.XposedLoad;
 import li.lingfeng.ltweaks.prefs.PackageNames;
 import li.lingfeng.ltweaks.utils.Logger;
-import li.lingfeng.ltweaks.utils.Utils;
-import li.lingfeng.ltweaks.utils.WYHookie;
-import li.lingfeng.ltweaks.utils.YWUtilsForMainFrameActivity;
-import li.lingfeng.ltweaks.utils.YWUtilsLogger;
+import li.lingfeng.ltweaks.ywhook.WYHookie;
+import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 import li.lingfeng.ltweaks.xposed.XposedBase;
 
 /**
@@ -47,7 +45,7 @@ public class XposedAutoSignInClip extends XposedBase {
 
     private Activity mActivity;
     private WYHookie hookie = null;
-    private Object mallFloor_Icon;
+    public static Object mallFloor_Icon;
 
     @Override
     protected void handleLoadPackage() throws Throwable {
@@ -79,9 +77,7 @@ public class XposedAutoSignInClip extends XposedBase {
 
                 mActivity = (Activity) param.thisObject;
                 // YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
-                if(null == hookie){
-                    hookie = new WYHookie(param);
-                }
+                hookie = WYHookie.getInstance(param);
 
                 hookie.hookOnResume();
             }

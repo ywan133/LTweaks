@@ -1,4 +1,4 @@
-package li.lingfeng.ltweaks.utils;
+package li.lingfeng.ltweaks.ywhook;
 
 import android.app.Activity;
 import android.view.View;
@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import de.robv.android.xposed.XC_MethodHook;
+import li.lingfeng.ltweaks.utils.Logger;
+import li.lingfeng.ltweaks.xposed.shopping.XposedAutoSignInClip;
 
 /**
  * Created by yangwan on 12/06/2017.
@@ -20,9 +22,22 @@ public class WYHookie {
     private int runOnResumeHookTimes = 3;
     private int runOnLayoutHookTimes = 3;
 
-    public RelativeLayout tmp京豆RelativeLayout = null;
+    private RelativeLayout tmp京豆RelativeLayout = null;
 
-    public WYHookie(XC_MethodHook.MethodHookParam param) {
+    private static WYHookie hookie = null;
+
+    public static WYHookie getInstance(XC_MethodHook.MethodHookParam param){
+        if(null == hookie){
+            synchronized (WYHookie.class){
+                if(null == hookie){
+                    hookie = new WYHookie(param);
+                }
+            }
+        }
+        return hookie;
+    }
+
+    private WYHookie(XC_MethodHook.MethodHookParam param) {
         activity = (Activity) param.thisObject;
         rootView = (ViewGroup) activity.findViewById(android.R.id.content);
     }
@@ -37,7 +52,7 @@ public class WYHookie {
             if(0 == runOnResumeHookTimes){
                 Logger.toast_i(activity, "onResume 次数用完");
             }
-
+            invokeClick();
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
@@ -54,7 +69,7 @@ public class WYHookie {
             if(0 == runOnLayoutHookTimes){
                 Logger.toast_i(activity, "onLayout 次数用完");
             }
-
+            invokeClick();
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
@@ -64,6 +79,7 @@ public class WYHookie {
         try{
             this.activity = null;
             this.rootView = null;
+            hookie = null;
         }catch (Throwable t){
             YWUtilsLogger.printMsg2ExportedActivity(activity, t);
         }
@@ -203,6 +219,26 @@ public class WYHookie {
         }catch (Throwable throwable){
             Logger.e(throwable.getMessage());
         }
+    }
+
+    private void invokeClick(){
+        if(null == tmp京豆RelativeLayout){
+            // Logger.toast_i(mActivity, "tmp 无");
+            return;
+        }
+        if(null == XposedAutoSignInClip.mallFloor_Icon){
+            // Logger.toast_i(mActivity, "tmp 无");
+            return;
+        }
+        Logger.toast_i(activity, "tmp 都有了!");
+
+
+        YWUtilsForMainFrameActivity.invokeClickTmp(
+                XposedAutoSignInClip.mallFloor_Icon,
+                "onIconItemClick",
+                tmp京豆RelativeLayout, 5,
+                activity);
+
     }
 
 
