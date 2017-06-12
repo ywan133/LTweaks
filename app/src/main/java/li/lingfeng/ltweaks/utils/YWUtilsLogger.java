@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * Created by yangwan on 08/06/2017.
@@ -31,6 +32,9 @@ public class YWUtilsLogger {
                 printViewHierarchy((ViewGroup)v, desc);
             }
         }
+    }
+    public static void printMsg2ExportedActivity(Activity act, Throwable t){
+        YWUtilsLogger.printMsg2ExportedActivity(act, Arrays.toString(t.getStackTrace()));
     }
 
     public static void printMsg2ExportedActivity(Activity act, String msg){

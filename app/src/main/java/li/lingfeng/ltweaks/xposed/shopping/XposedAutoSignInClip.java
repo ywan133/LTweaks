@@ -16,6 +16,7 @@ import li.lingfeng.ltweaks.lib.XposedLoad;
 import li.lingfeng.ltweaks.prefs.PackageNames;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.utils.Utils;
+import li.lingfeng.ltweaks.utils.WYHookie;
 import li.lingfeng.ltweaks.utils.YWUtilsForMainFrameActivity;
 import li.lingfeng.ltweaks.utils.YWUtilsLogger;
 import li.lingfeng.ltweaks.xposed.XposedBase;
@@ -91,6 +92,7 @@ public class XposedAutoSignInClip extends XposedBase {
 
     }
 
+    WYHookie hookie = null;
     private void successHook_MainFrameActivity(){
         findAndHookActivity(MAIN_FRAME_ACTIVITY, "onResume", new XC_MethodHook() {
             @Override
@@ -98,8 +100,12 @@ public class XposedAutoSignInClip extends XposedBase {
                 super.afterHookedMethod(param);
 
                 mActivity = (Activity) param.thisObject;
-                YWUtilsForMainFrameActivity.hackIt(mActivity);
-                YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
+                // YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
+                if(null == hookie){
+                    hookie = new WYHookie(param);
+                }
+
+                hookie.hookOnResume();
             }
 
 
@@ -250,9 +256,9 @@ public class XposedAutoSignInClip extends XposedBase {
                 super.afterHookedMethod(param);
                 mallFloor_Icon = param.thisObject;
                 // Logger.toast_i(mActivity, "onLayout");
-                YWUtilsForMainFrameActivity.hackIt(mActivity);
 
-                YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
+                // YWUtilsForMainFrameActivity.invokeIt(mActivity, mallFloor_Icon);
+                hookie.hookOnLayout();
 
             }
         });
