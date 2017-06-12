@@ -16,6 +16,7 @@ import li.lingfeng.ltweaks.lib.XposedLoad;
 import li.lingfeng.ltweaks.prefs.PackageNames;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.ywhook.WYHookie;
+import li.lingfeng.ltweaks.ywhook.WYHookieMallFloor_Icon;
 import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 import li.lingfeng.ltweaks.xposed.XposedBase;
 
@@ -210,17 +211,7 @@ public class XposedAutoSignInClip extends XposedBase {
                 super.afterHookedMethod(param);
 
                 mallFloor_Icon = param.thisObject;
-
-
-                // Logger.toast_i(mActivity, "createGridView...");
-                // Logger.toast_i(mActivity, Arrays.toString(param.args));
-                Object adapter = param.args[0];
-                Object _hooked_int = param.args[2];
-                Object result = param.getResultOrThrowable(); // viewPager
-                // Utils.printMsg2ExportedActivity(mActivity, adapter.getClass().getCanonicalName());
-                // Object result = Utils.invokeMeth(adapter, "getItem", 1);// null
-                // Utils.printMsg2ExportedActivity(mActivity, adapter.getClass().getCanonicalName());
-                //Utils.printClassMethods2ExportedActivity(mActivity, result);
+                WYHookieMallFloor_Icon.getInstance(param, mActivity).hookCreateGridView(param);
             }
         });
 
