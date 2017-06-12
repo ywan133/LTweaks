@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.graphics.Color;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.lang.reflect.Field;
 
@@ -11,6 +15,8 @@ import de.robv.android.xposed.XC_MethodHook;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.utils.ShareUtils;
 import li.lingfeng.ltweaks.xposed.XposedBase;
+import li.lingfeng.ltweaks.ywhook.YWUtilsForMainFrameActivity;
+import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 
 /**
  * Created by smallville on 2017/5/31.
@@ -61,6 +67,9 @@ public abstract class XposedShareClip extends XposedBase {
 
                     }
                 }
+                ViewGroup rootView = (ViewGroup) mActivity.findViewById(android.R.id.content);
+                recursiveLoopChildren(rootView);
+                // YWUtilsLogger.printClassMethods2ExportedActivity(mActivity, null);
 
                 /*
                 Intent _intent = new Intent();
@@ -89,6 +98,38 @@ public abstract class XposedShareClip extends XposedBase {
                 */
 
             }
+
+            private void recursiveLoopChildren(ViewGroup parent) {
+                for (int i = parent.getChildCount() - 1; i >= 0; i--) {
+                    final View child = parent.getChildAt(i);
+                    if (child instanceof ViewGroup) {
+                        recursiveLoopChildren((ViewGroup) child);
+                        // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
+
+                    } else {
+                        if (child != null) {
+                            // DO SOMETHING WITH VIEW
+                            Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
+                            if(null == title) continue;
+
+                            if(title instanceof String && title.equals("详情")){
+                                int redColorValue = Color.RED;
+                                child.setBackgroundColor(redColorValue);
+                            }
+                            if(title instanceof String && title.equals("商品")){
+                                int redColorValue = Color.RED;
+                                child.setBackgroundColor(redColorValue);
+                            }
+                            if(title instanceof String && title.equals("评价")){
+                                int redColorValue = Color.RED;
+                                child.setBackgroundColor(redColorValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+
         });
 
         findAndHookActivity(getItemActivity(), "onStop", new XC_MethodHook() {
@@ -101,6 +142,16 @@ public abstract class XposedShareClip extends XposedBase {
         });
 
 
+        findAndHookActivity(getItemActivity(), "onCreateOptionsMenu", Menu.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+
+                Logger.toast_i(mActivity, "onCreateOptionsMenu");
+
+            }
+        });
+
 
         if (getShareActivity() != null) {
             findAndHookActivity(getShareActivity(), "onResume", new XC_MethodHook() {
@@ -108,7 +159,7 @@ public abstract class XposedShareClip extends XposedBase {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.i("Share activity onResume.");
                     mIsSharing = true;
-                     Logger.toast_i(mActivity, "ShareActivity: share act resume");
+                    // Logger.toast_i(mActivity, "ShareActivity: share act resume");
                 }
             });
 
@@ -117,10 +168,12 @@ public abstract class XposedShareClip extends XposedBase {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.i("Share activity onPause.");
                     mIsSharing = false;
-                     Logger.toast_i(mActivity, "ShareActivity: share act pause");
+                    // Logger.toast_i(mActivity, "ShareActivity: share act pause");
                 }
             });
         }
+
+
     }
 
     protected abstract String getItemActivity();

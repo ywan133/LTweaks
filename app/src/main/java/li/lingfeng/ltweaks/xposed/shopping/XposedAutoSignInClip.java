@@ -90,6 +90,9 @@ public class XposedAutoSignInClip extends XposedBase {
 
 
         });
+
+
+
         findAndHookActivity(MAIN_ACTIVITY, "onDestroy", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
