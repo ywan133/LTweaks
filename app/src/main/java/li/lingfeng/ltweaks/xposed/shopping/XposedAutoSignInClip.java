@@ -46,6 +46,7 @@ public class XposedAutoSignInClip extends XposedBase {
     private static final String JD_MallFloor_Icon = "com.jingdong.app.mall.home.floor.view.view.MallFloor_Icon";
 
     private Activity mActivity;
+    private WYHookie hookie = null;
     private Object mallFloor_Icon;
 
     @Override
@@ -55,26 +56,6 @@ public class XposedAutoSignInClip extends XposedBase {
         testHook_JD_MallFloor_Icon();
         // testHook_JDGridViewInViewPager();
         // testHook_JD_GRID_VIEW_PAGER_GRID_VIEW();
-
-        /*
-        // onInterceptTouchEvent
-        // onTouchEvent
-        findAndHookMethod(JD_GRID_VIEW_PAGER, "onInterceptTouchEvent", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-
-                Object current = param.thisObject;
-                Logger.toast_i(mActivity, current.toString());
-                Logger.toast_i(mActivity, Arrays.toString(param.args));
-
-            }
-        });
-        */
-
-
-
-
 
         /*
         // Can't handleLoadPackage, java.lang.ClassNotFoundException: Lcom.jingdong.app.mall.home.floor.view.view.MallFloor_Icon
@@ -87,12 +68,9 @@ public class XposedAutoSignInClip extends XposedBase {
             }
         });
         */
-
-
-
     }
 
-    WYHookie hookie = null;
+
     private void successHook_MainFrameActivity(){
         findAndHookActivity(MAIN_FRAME_ACTIVITY, "onResume", new XC_MethodHook() {
             @Override
@@ -170,6 +148,8 @@ public class XposedAutoSignInClip extends XposedBase {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
                 mActivity = null;
+                hookie.hookOnDestroy();
+                hookie = null;
             }
         });
     }
