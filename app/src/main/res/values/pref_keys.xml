@@ -2,8 +2,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- The values below are used for pref keys, should never be changed. -->
     <!--Google-->
+    <string name="key_google_dismiss_location_checker">key_google_dismiss_location_checker</string>
     <string name="key_google_remove_bottom_bar">key_google_remove_bottom_bar</string>
     <string name="key_google_plus_remove_bottom_bar">key_google_plus_remove_bottom_bar</string>
+    <string name="key_google_plus_top_right_refresh">key_google_plus_top_right_refresh</string>
     <string name="key_google_photos_remove_bottom_bar">key_google_photos_remove_bottom_bar</string>
     <string name="key_google_newsstand_remove_bottom_bar">key_google_newsstand_remove_bottom_bar</string>
     <string name="key_google_play_view_in_coolapk">key_google_play_view_in_coolapk</string>
@@ -27,7 +29,7 @@
     <!--Entertainment-->
     <string name="key_douban_movie_url">key_douban_movie_url</string>
     <string name="key_douban_movie_skip_splash">key_douban_movie_skip_splash</string>
-    <string name="key_bilibili_subscriptions_goto_top">key_bilibili_subscriptions_goto_top</string>
+    <!-- Removed "key_bilibili_subscriptions_goto_top" -->
 
     <!--System-->
     <string name="key_text_aide_open_youdao">key_text_aide_open_youdao</string>
