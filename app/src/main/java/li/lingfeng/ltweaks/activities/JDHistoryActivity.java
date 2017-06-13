@@ -35,6 +35,7 @@ import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -47,11 +48,13 @@ import java.util.regex.Pattern;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.R;
 import li.lingfeng.ltweaks.utils.ShoppingUtils;
+import li.lingfeng.ltweaks.ywhook.YWUtilsForMainFrameActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
 
 // This name should be PriceHistoryActivity, due to compatible with old version, keep it for now.
 public class JDHistoryActivity extends AppCompatActivity implements
@@ -79,11 +82,48 @@ public class JDHistoryActivity extends AppCompatActivity implements
 
         String text = getIntent().getStringExtra(Intent.EXTRA_TEXT);
         Logger.i("Got share text: " + text);
+        if(YWUtilsForMainFrameActivity.isJSONValid(text)){
+            String result = String.valueOf(new JsonParser().parse(text).getAsJsonObject().get("product_id"));
+            result = result.substring(1, result.length() - 1);
+            wy_findItemIdAndGrabHistory(result, ShoppingUtils.STORE_JD);
+            return;
+        }
         boolean ok = findItemIdAndGrabHistory(text);
         if (!ok) {
             tryRedirect(text);
         }
     }
+
+
+    // wy created
+    // duplicated
+    private boolean wy_findItemIdAndGrabHistory(String itemId, @ShoppingUtils.Store int store) {
+
+        PriceHistoryGrabber grabber = new PriceHistoryGrabber(store, itemId,
+                new PriceHistoryGrabber.GrabCallback() {
+                    @Override
+                    public void onResult(final PriceHistoryGrabber.Result result) {
+                        Logger.i("Prices result " + result);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (result == null) {
+                                    Toast.makeText(JDHistoryActivity.this, R.string.jd_history_can_not_get_prices, Toast.LENGTH_SHORT).show();
+                                    JDHistoryActivity.this.finish();
+                                    return;
+                                }
+                                mData = result;
+                                createChart(result);
+                                mProgressBar.setVisibility(View.INVISIBLE);
+                                mChart.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }
+                });
+        grabber.startRequest();
+        return true;
+    };
+
 
     private boolean findItemIdAndGrabHistory(String text) {
         Pair<String, Integer> item = ShoppingUtils.findItemId(text);

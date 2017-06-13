@@ -9,6 +9,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Field;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -26,16 +29,11 @@ public abstract class XposedShareClip extends XposedBase {
 
     private Activity mActivity;
     private boolean mIsSharing = false;
-
+    String foundProductId = "";
 
 
     @Override
     protected void handleLoadPackage() throws Throwable {
-
-
-
-
-
 
         findAndHookMethod(ClipboardManager.class, "setPrimaryClip", ClipData.class, new XC_MethodHook() {
             @Override
@@ -58,7 +56,7 @@ public abstract class XposedShareClip extends XposedBase {
                 Intent intent = mActivity.getIntent();
 
 
-                String foundProductId = "";
+
                 if(null != intent){
                     if(null != intent.getExtras()){
                         foundProductId = intent.getExtras().get("id").toString();
@@ -112,18 +110,43 @@ public abstract class XposedShareClip extends XposedBase {
                             Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
                             if(null == title) continue;
 
-                            if(title instanceof String && title.equals("详情")){
-                                int redColorValue = Color.RED;
-                                child.setBackgroundColor(redColorValue);
-                            }
+//                            if(title instanceof String && title.equals("详情")){
+//                                int redColorValue = Color.RED;
+//                                child.setBackgroundColor(redColorValue);
+//                            }
                             if(title instanceof String && title.equals("商品")){
                                 int redColorValue = Color.RED;
                                 child.setBackgroundColor(redColorValue);
+
+                                child.setClickable(true);
+                                child.setLongClickable(true);
+                                child.setOnLongClickListener(new View.OnLongClickListener() {
+                                    @Override
+                                    public boolean onLongClick(View v) {
+                                        Logger.toast_i_long(mActivity, "long click");
+
+
+                                        JSONObject node = new JSONObject();
+                                        try {
+                                            node.put("product_id", foundProductId);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        Intent intent = new Intent(Intent.ACTION_SEND);
+                                        intent.setType("text/plain");
+                                        intent.putExtra(Intent.EXTRA_TEXT, node.toString());
+                                        mActivity.startActivity(intent);
+
+
+                                        return false;
+                                    }
+                                });
                             }
-                            if(title instanceof String && title.equals("评价")){
-                                int redColorValue = Color.RED;
-                                child.setBackgroundColor(redColorValue);
-                            }
+//                            if(title instanceof String && title.equals("评价")){
+//                                int redColorValue = Color.RED;
+//                                child.setBackgroundColor(redColorValue);
+//                            }
                         }
                     }
                 }
