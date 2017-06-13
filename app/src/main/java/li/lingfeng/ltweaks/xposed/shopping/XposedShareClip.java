@@ -18,6 +18,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import li.lingfeng.ltweaks.utils.Logger;
 import li.lingfeng.ltweaks.utils.ShareUtils;
 import li.lingfeng.ltweaks.xposed.XposedBase;
+import li.lingfeng.ltweaks.ywhook.YWUtilsForJdPrice;
 import li.lingfeng.ltweaks.ywhook.YWUtilsForMainFrameActivity;
 import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 
@@ -29,7 +30,7 @@ public abstract class XposedShareClip extends XposedBase {
 
     private Activity mActivity;
     private boolean mIsSharing = false;
-    String foundProductId = "";
+    private String foundProductId = "";
 
 
     @Override
@@ -55,15 +56,9 @@ public abstract class XposedShareClip extends XposedBase {
 
                 Intent intent = mActivity.getIntent();
 
-
-
-                if(null != intent){
-                    if(null != intent.getExtras()){
-                        foundProductId = intent.getExtras().get("id").toString();
-                        Logger.toast_i(mActivity, "id:" + foundProductId);
-                    }else{
-
-                    }
+                if(null != intent && null != intent.getExtras()){
+                    foundProductId = intent.getExtras().get("id").toString();
+                    Logger.toast_i(mActivity, "id:" + foundProductId);
                 }
                 ViewGroup rootView = (ViewGroup) mActivity.findViewById(android.R.id.content);
                 recursiveLoopChildren(rootView);
@@ -125,27 +120,7 @@ public abstract class XposedShareClip extends XposedBase {
                                     public boolean onLongClick(View v) {
                                         // Logger.toast_i_long(mActivity, "long click");
 
-                                        JSONObject node = new JSONObject();
-                                        try {
-                                            node.put("product_id", foundProductId);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        Intent intent = new Intent();
-                                        intent.setClassName(
-                                                // Your app's package name
-                                                "li.lingfeng.ltweaks",
-                                                // The full class name of the activity you want to start
-                                                "li.lingfeng.ltweaks.activities.JDHistoryActivity");
-                                        intent.setType("data/view");
-
-                                        intent.putExtra(Intent.EXTRA_TEXT, node.toString());
-                                        mActivity.startActivity(intent);
-
-
-
-
+                                       YWUtilsForJdPrice.invokeJdPriceHistory(foundProductId, mActivity);
                                         return false;
                                     }
                                 });
@@ -158,22 +133,6 @@ public abstract class XposedShareClip extends XposedBase {
                     }
                 }
             }
-
-            private void invokeSharedMenu(){
-                JSONObject node = new JSONObject();
-                try {
-                    node.put("product_id", foundProductId);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, node.toString());
-                mActivity.startActivity(intent);
-
-            }
-
 
         });
 
