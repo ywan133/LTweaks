@@ -69,11 +69,15 @@ public class JDHistoryActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!getIntent().getAction().equals(Intent.ACTION_SEND) || !getIntent().getType().equals("text/plain")) {
+
+        /*
+        if (!getIntent().getAction().equals(Intent.ACTION_SEND) ||
+                !getIntent().getType().equals("text/plain")) {
             Toast.makeText(this, R.string.not_supported, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+        */
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_jd_history);
