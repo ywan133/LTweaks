@@ -26,7 +26,7 @@ public class WYHookie {
     // 用来防止其 卡顿
     private int runOnResumeHookTimes = 1;
     private int runOnLayoutHookTimes = 3;
-    private boolean runInvokeAlready = false;
+    private boolean runInvokeAlready = true;
     private boolean runAlphaAlready = false;
 
     private RelativeLayout tmp京豆RelativeLayout = null;

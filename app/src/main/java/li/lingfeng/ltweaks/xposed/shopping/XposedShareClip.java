@@ -54,86 +54,26 @@ public abstract class XposedShareClip extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 mActivity = (Activity) param.thisObject;
 
-                Intent intent = mActivity.getIntent();
-
-                if(null != intent && null != intent.getExtras()){
-                    foundProductId = intent.getExtras().get("id").toString();
-                    Logger.toast_i(mActivity, "id:" + foundProductId);
-                }
-                ViewGroup rootView = (ViewGroup) mActivity.findViewById(android.R.id.content);
-                recursiveLoopChildren(rootView);
-                // YWUtilsLogger.printClassMethods2ExportedActivity(mActivity, null);
-
-                /*
-                Intent _intent = new Intent();
-                _intent.setClassName(
-                        // Your app's package name
-                        "li.lingfeng.ltweaks",
-                        // The full class name of the activity you want to start
-                        "li.lingfeng.ltweaks.activities.WYViewHierarchyActivity");
-                _intent.setType("data/view");
-                _intent.putExtra(Intent.EXTRA_TEXT, intent.getExtras().toString());
-                mActivity.startActivity(_intent);
-                */
-
-                Intent _fuck_intent = new Intent(Intent.ACTION_SEND);
-                _fuck_intent.setType("text/plain");
-                _fuck_intent.putExtra(Intent.EXTRA_TEXT, foundProductId);
-                // mActivity.startActivity(_fuck_intent);
-
-                /*
-                Field[] fields = mActivity.getClass().getFields();
-                String str = "";
-                for(Field f:fields){
-                    str = str + f.getName() + ";";
-                }
-                Logger.toast_i(mActivity, str);
-                */
-
-            }
-
-            private void recursiveLoopChildren(ViewGroup parent) {
-                for (int i = parent.getChildCount() - 1; i >= 0; i--) {
-                    final View child = parent.getChildAt(i);
-                    if (child instanceof ViewGroup) {
-                        recursiveLoopChildren((ViewGroup) child);
-                        // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
-
-                    } else {
-                        if (child != null) {
-                            // DO SOMETHING WITH VIEW
-                            Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
-                            if(null == title) continue;
-
-//                            if(title instanceof String && title.equals("详情")){
-//                                int redColorValue = Color.RED;
-//                                child.setBackgroundColor(redColorValue);
-//                            }
-                            if(title instanceof String && title.equals("商品")){
-                                int redColorValue = Color.RED;
-                                child.setBackgroundColor(redColorValue);
-
-                                child.setClickable(true);
-                                child.setLongClickable(true);
-                                child.setOnLongClickListener(new View.OnLongClickListener() {
-                                    @Override
-                                    public boolean onLongClick(View v) {
-                                        // Logger.toast_i_long(mActivity, "long click");
-
-                                       YWUtilsForJdPrice.invokeJdPriceHistory(foundProductId, mActivity);
-                                        return false;
-                                    }
-                                });
-                            }
-//                            if(title instanceof String && title.equals("评价")){
-//                                int redColorValue = Color.RED;
-//                                child.setBackgroundColor(redColorValue);
-//                            }
-                        }
+                // just in case if it is not jing-dong
+                try {
+                    Intent intent = mActivity.getIntent();
+                    if (null != intent && null != intent.getExtras()) {
+                        foundProductId = intent.getExtras().get("id").toString();
+                        Logger.toast_i(mActivity, "id:" + foundProductId);
                     }
+                    ViewGroup rootView = (ViewGroup) mActivity.findViewById(android.R.id.content);
+                    YWUtilsForJdPrice.hookALongClickBtn(rootView, foundProductId, mActivity);
+                }catch (Throwable t){
+                    Logger.toast_i(mActivity, "jd-price-history");
                 }
             }
-
+        });
+        findAndHookActivity(getItemActivity(), "onDestroy", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                YWUtilsForJdPrice.onDestroy();
+            }
         });
 
         findAndHookActivity(getItemActivity(), "onStop", new XC_MethodHook() {

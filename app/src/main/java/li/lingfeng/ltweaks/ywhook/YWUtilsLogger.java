@@ -97,7 +97,7 @@ public class YWUtilsLogger {
         Object result = recursiveLoopChildren(view);
         String str = result.toString();
 
-        // printMsg2ExportedActivity(act, str);
+        printMsg2ExportedActivity(act, str);
     }
 
 

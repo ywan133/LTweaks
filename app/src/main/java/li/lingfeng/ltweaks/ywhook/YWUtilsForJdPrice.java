@@ -2,6 +2,9 @@ package li.lingfeng.ltweaks.ywhook;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +15,67 @@ import org.json.JSONObject;
 
 public class YWUtilsForJdPrice {
 
-    public static void invokeJdPriceHistory(String foundProductId, Activity mActivity){
+
+    private static String PRODUCT_ID;
+    private static Activity ACTIVITY;
+
+    public static void hookALongClickBtn(ViewGroup rootView, String foundProductId, Activity mActivity){
+
+        PRODUCT_ID = foundProductId;
+        ACTIVITY = mActivity;
+
+        View child = recursiveLoopChildren(rootView);
+
+        int redColorValue = Color.RED;
+        child.setBackgroundColor(redColorValue);
+
+        child.setClickable(true);
+        child.setLongClickable(true);
+        child.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Logger.toast_i_long(mActivity, "long click");
+
+                YWUtilsForJdPrice.invokeJdPriceHistory(PRODUCT_ID, ACTIVITY);
+                return false;
+            }
+        });
+
+    }
+
+    private static View recursiveLoopChildren(ViewGroup parent) {
+        for (int i = parent.getChildCount() - 1; i >= 0; i--) {
+            final View child = parent.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                View foundIt = recursiveLoopChildren((ViewGroup) child);
+                // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
+                if(null != foundIt){
+                    return foundIt;
+                }
+            } else {
+                if (child != null) {
+                    // DO SOMETHING WITH VIEW
+                    Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
+                    if(null == title) continue;
+
+//                            if(title instanceof String && title.equals("详情")){
+//                                int redColorValue = Color.RED;
+//                                child.setBackgroundColor(redColorValue);
+//                            }
+                    if(title instanceof String && title.equals("商品")){
+                        return child;
+                    }
+//                            if(title instanceof String && title.equals("评价")){
+//                                int redColorValue = Color.RED;
+//                                child.setBackgroundColor(redColorValue);
+//                            }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void invokeJdPriceHistory(String foundProductId, Activity mActivity){
 
         JSONObject node = new JSONObject();
         try {
@@ -32,5 +95,10 @@ public class YWUtilsForJdPrice {
         intent.putExtra(Intent.EXTRA_TEXT, node.toString());
         mActivity.startActivity(intent);
 
+    }
+
+    public static void onDestroy() {
+        PRODUCT_ID = null;
+        ACTIVITY = null;
     }
 }
