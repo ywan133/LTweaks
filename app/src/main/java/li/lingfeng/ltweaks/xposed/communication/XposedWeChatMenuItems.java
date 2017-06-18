@@ -25,7 +25,9 @@ public class XposedWeChatMenuItems extends XposedBase {
     private Activity activity;
     private MenuItem showViewTreeBtn;
     private MenuItem showFindViewTest;
+    private MenuItem showFindViewLayout;
     private MenuItem showActivityMethods;
+    private MenuItem showActivityFields;
 
     @Override
     protected void handleLoadPackage() throws Throwable {
@@ -47,9 +49,12 @@ public class XposedWeChatMenuItems extends XposedBase {
                 // Logger.toast_i(activity, "onCreateOptionsMenu, LauncherUI");
                 Menu menu = (Menu) param.args[0];
 
-                showViewTreeBtn = menu.add(Menu.NONE, 12345, 0, "显示View树");
-                showFindViewTest = menu.add(Menu.NONE, 123456, 0, "查找view-text");
-                showActivityMethods = menu.add(Menu.NONE, 123457, 0, "显示methods");
+                showViewTreeBtn = menu.add(Menu.NONE, 1000, 0, "显示View树");
+                showFindViewTest = menu.add(Menu.NONE, 1001, 0, "查找 聪明的我们");
+                showFindViewLayout = menu.add(Menu.NONE, 1002, 0, "查找 layout");
+                showActivityMethods = menu.add(Menu.NONE, 1003, 0, "显示methods");
+                showActivityFields = menu.add(Menu.NONE, 1004, 0, "显示fields");
+
                 showViewTreeBtn.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
         });
@@ -70,8 +75,28 @@ public class XposedWeChatMenuItems extends XposedBase {
                         Logger.toast_i_long(activity, "not found");
                     }
                 }
+                if (item == showFindViewLayout) {
+                    // 方法1, 失败,没找到
+                    // find "聪明的我们"
+                    // ViewGroup rootView = (ViewGroup) activity.findViewById(android.R.id.content);
+                    // 方法2, 失败, 没找到
+                    // View v = YWUtilsForWechat.recursiveLoopChildrenFindType(rootView, "com.tencent.mm.ui.widget.SwipeBackLayout");
+                    // 方法3, 失败, 竟然为空
+                    Object v = YWUtilsForWechat.findSwipeBackLayout(activity);
+                    // 方法4, ...
+                    if(null != v) {
+                        Logger.toast_i_long(activity, v.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found layout");
+                    }
+                }
+
+
                 if(item == showActivityMethods){
                     YWUtilsLogger.printClassMethods2ExportedActivity(activity, null);
+                }
+                if(item == showActivityFields){
+                    YWUtilsLogger.printFields2ExportedActivity(activity, null);
                 }
 
 
@@ -91,8 +116,13 @@ public class XposedWeChatMenuItems extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
 
-                activity = (Activity) param.thisObject;
+                // activity = (Activity) param.thisObject;
                 // Logger.toast_i(activity, "onDestroy, LauncherUI");
+                activity = null;
+                showViewTreeBtn = null;
+                showFindViewTest = null;
+                showActivityMethods = null;
+                showActivityFields = null;
             }
         });
 

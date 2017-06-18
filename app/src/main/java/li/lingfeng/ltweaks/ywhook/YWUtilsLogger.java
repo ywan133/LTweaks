@@ -72,7 +72,11 @@ public class YWUtilsLogger {
         Field[] fields = target.getClass().getFields();
         String str = "";
         for(Field f:fields){
-            str = str + f.getName() + ";";
+            // com.tencent.mm.ui.HomeUI:tRc;
+            // boolean:tRf;
+            // long:tRb;
+            // int:RESULT_OK;
+            str = str + f.getType().getCanonicalName() + ":" + f.getName() + ";\n\n";
         }
         printMsg2ExportedActivity(act, str);
     }
@@ -109,6 +113,8 @@ public class YWUtilsLogger {
         act.sendBroadcast(intent);
     }
 
+
+
     // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
     public static Object recursiveLoopChildren(ViewGroup parent) {
 
@@ -123,8 +129,8 @@ public class YWUtilsLogger {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                Object innerNode = recursiveLoopChildren((ViewGroup) child);
-                putIn(node, null,innerNode);
+                Object innerNode =  recursiveLoopChildren((ViewGroup) child);
+                putIn(node, null, innerNode);
                 // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
             } else {
                 if (child != null) {
@@ -133,10 +139,9 @@ public class YWUtilsLogger {
                     // String name = child.getClass().getCanonicalName();
                     // 简单的名字
                     String name = child.getClass().getSimpleName();
-
-                    if(child instanceof TextView){
-                        name += ((TextView)child).getText();
-                    }
+                    Object title = YWUtilsForMainFrameActivity.invokeNoParamMeth(child, "getText");
+                    if(null != title && title instanceof String && ((String) title).length() > 0)
+                        name += "(" +title + ")";
 
                     putIn(node, name, null);
                 }
@@ -144,6 +149,13 @@ public class YWUtilsLogger {
         }
         return node;
     }
+
+    /**
+     *
+     * @param node      JsonObject or JsonArray
+     * @param v         JsonObject的话, 它是其class name + text内容
+     * @param inner     应该是个JsonArray?
+     */
     private static void putIn(Object node, String v, Object inner){
         if(null != v){
             if(node instanceof JSONObject){
@@ -153,9 +165,10 @@ public class YWUtilsLogger {
                 putInArray((JSONArray) node, v);
             }
         }else{
+            // 这里存的是
             if(node instanceof JSONObject){
                 try {
-                    String groupName = inner.getClass().getCanonicalName();
+                    String groupName = inner.getClass().getSimpleName();
                     ((JSONObject)node).put(groupName, inner);
                 } catch (JSONException e) {
                     e.printStackTrace();

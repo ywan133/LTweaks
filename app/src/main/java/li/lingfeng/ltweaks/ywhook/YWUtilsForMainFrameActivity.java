@@ -55,9 +55,9 @@ public class YWUtilsForMainFrameActivity {
         try {
             method = obj.getClass().getMethod(methodName);
         } catch (SecurityException e) {
-            Logger.stackTrace(e);
+            // Logger.stackTrace(e);
         }  catch (NoSuchMethodException e) {
-            Logger.stackTrace(e);
+            // Logger.stackTrace(e);
         }
         try {
             if (method != null) {
