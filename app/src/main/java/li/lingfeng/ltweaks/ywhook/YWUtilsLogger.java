@@ -116,21 +116,50 @@ public class YWUtilsLogger {
 
 
     // https://stackoverflow.com/questions/2597230/loop-through-all-subviews-of-an-android-view
-    public static Object recursiveLoopChildren(ViewGroup parent) {
+    public static JSONObject recursiveLoopChildren(ViewGroup parent) {
 
         // for each viewGroup, we must have one node;
-        Object node = null;
+        // 无论是 viewGroup 还是view, 我们永远有一对key-value json object
+        JSONObject node = new JSONObject();
+        JSONArray inner = null;
+        boolean parentIsAViewGroup = false;
+
+        // 如果是viewGroup, 我们特殊处理一下:
         if(parent.getChildCount() > 1){
-            node = new JSONArray();
-        }else{
-            node = new JSONObject();
+            parentIsAViewGroup = true;
+            inner = new JSONArray();
+            try {
+                node.put(parent.getClass().getSimpleName(), inner);
+            } catch (JSONException e) {
+                try {
+                    node.put(parent.getClass().getSimpleName(), e.getMessage());
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
 
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                Object innerNode =  recursiveLoopChildren((ViewGroup) child);
-                putIn(node, null, innerNode);
+                JSONObject innerNode =  recursiveLoopChildren((ViewGroup) child);
+                // putIn(node, null, innerNode);
+                // putInJson(node, innerNode);
+
+                if(parentIsAViewGroup){
+                    inner.put(innerNode);
+                }else{
+                    try {
+                        node.put(child.getClass().getSimpleName(), innerNode);
+                    } catch (JSONException e) {
+                        try {
+                            node.put(child.getClass().getSimpleName(), e.getMessage());
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+
                 // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
             } else {
                 if (child != null) {
@@ -143,7 +172,13 @@ public class YWUtilsLogger {
                     if(null != title && title instanceof String && ((String) title).length() > 0)
                         name += "(" +title + ")";
 
-                    putIn(node, name, null);
+                    if(parentIsAViewGroup){
+                        // 它的子孙
+                        putInArray(inner, name);
+                    }else{
+                        Logger.e("parentIsAViewGroup is false!?");
+                        putInJson(node, name);
+                    }
                 }
             }
         }
