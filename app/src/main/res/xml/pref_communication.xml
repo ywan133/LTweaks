@@ -17,5 +17,10 @@
             android:showDefault="true"
             android:showSilent="true"
             android:ringtoneType="ringtone" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_wechat_wy_menu_items"
+            android:title="@string/key_wechat_wy_menu_items"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

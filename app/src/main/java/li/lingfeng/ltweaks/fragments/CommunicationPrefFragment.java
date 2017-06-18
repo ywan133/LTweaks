@@ -9,8 +9,10 @@ import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
 
 import li.lingfeng.ltweaks.R;
+import li.lingfeng.ltweaks.activities.WYViewHierarchyActivity;
 import li.lingfeng.ltweaks.lib.PreferenceChange;
 import li.lingfeng.ltweaks.prefs.Prefs;
+import li.lingfeng.ltweaks.utils.ComponentUtils;
 import li.lingfeng.ltweaks.utils.Logger;
 
 /**
@@ -46,5 +48,11 @@ public class CommunicationPrefFragment extends BasePrefFragment {
             Ringtone ring = RingtoneManager.getRingtone(getActivity(), uri);
             preference.setSummary(ring.getTitle(getActivity()));
         }
+    }
+    @PreferenceChange(prefs = R.string.key_wechat_wy_menu_items, refreshAtStart = true)
+    private void enableWeChatDebugMenuItems(SwitchPreference preference, Boolean enabled) {
+
+        ComponentUtils.enableComponent(WYViewHierarchyActivity.class, enabled);
+        findSwitchPreference(R.string.key_wechat_wy_menu_items).setChecked(enabled);
     }
 }
