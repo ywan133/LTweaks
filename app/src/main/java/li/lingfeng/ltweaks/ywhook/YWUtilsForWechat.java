@@ -75,21 +75,23 @@ public class YWUtilsForWechat {
         return null;
     }
 
-    public static Object findSwipeBackLayout(Activity activity){
-        Field[] fields = activity.getClass().getFields();
+    public static Object findFieldRef(Object target, String targetClassFullName){
+
+        // current class' public & private fields
+        Field[] fields = target.getClass().getDeclaredFields();
         for(Field f:fields){
 
-            if(SwipeBackLayout.equals(f.getType().getCanonicalName())){
+            if(targetClassFullName.equals(f.getType().getCanonicalName())){
                 try {
-                    Logger.i(f.getType().getSimpleName());
-                    Logger.i(f.getType().getCanonicalName());
-                    Logger.i(f.isAccessible() + "");
+                    // Logger.i(f.getType().getSimpleName());
+                    // Logger.i(f.getType().getCanonicalName());
+                    // Logger.i(f.isAccessible() + "");
                     f.setAccessible(true);
-                    Logger.i(f.isAccessible() + "");
+                    // Logger.i(f.isAccessible() + "");
 
                     // 它是一个null, 呃...
-                    Object foundIt = f.get(activity);
-                    Logger.i(foundIt.toString());
+                    Object foundIt = f.get(target);
+                    // Logger.i(foundIt.toString());
 
                     return foundIt;
                 } catch (IllegalAccessException e) {

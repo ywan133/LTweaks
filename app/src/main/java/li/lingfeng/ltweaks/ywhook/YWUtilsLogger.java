@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +12,10 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import li.lingfeng.ltweaks.utils.Logger;
 
@@ -69,18 +71,79 @@ public class YWUtilsLogger {
         if(null == target){
             target = act;
         }
-        Field[] fields = target.getClass().getFields();
+        Field[] fields = target.getClass().getDeclaredFields();
         String str = "";
         for(Field f:fields){
             // com.tencent.mm.ui.HomeUI:tRc;
             // boolean:tRf;
             // long:tRb;
             // int:RESULT_OK;
-            str = str + f.getType().getCanonicalName() + ":" + f.getName() + ";\n\n";
+            str = str + f.getType().getCanonicalName() + ":" + f.getName() + ";\n\n\n";
+
+            if("java.util.ArrayList".equals(f.getType().getCanonicalName())){
+                try {
+                    f.setAccessible(true);
+                    ArrayList arr = (ArrayList) f.get(target);
+                    for (Object obj: arr){
+                        str = str + "\t\t\t" + obj.getClass().getCanonicalName() + ":" + obj.toString() + ";\n";
+                    }
+                    // finally:
+                    str = str + "\n";
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    str = str + e.getMessage() + "\n";
+                }
+            }
+            if("java.util.LinkedList".equals(f.getType().getCanonicalName())){
+                try {
+                    f.setAccessible(true);
+                    LinkedList arr = (LinkedList) f.get(target);
+                    for (Object obj: arr){
+                        str = str + "\t\t\t" + obj.getClass().getCanonicalName() + ":" + obj.toString() + ";\n";
+                    }
+                    // finally:
+                    str = str + "\n";
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    str = str + e.getMessage() + "\n";
+                }
+            }
+            if("java.util.HashMap".equals(f.getType().getCanonicalName())){
+                try {
+                    f.setAccessible(true);
+                    HashMap arr = (HashMap) f.get(target);
+                    for (Object obj: arr.entrySet()){
+                        str = str + "\t\t\t" + obj.getClass().getCanonicalName() + ":" + obj.toString() + ";\n";
+                    }
+                    // finally:
+                    str = str + "\n";
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    str = str + e.getMessage() + "\n";
+                }
+            }
+
+
         }
         printMsg2ExportedActivity(act, str);
     }
 
+    public static void printLinedList(Activity activity, LinkedList tQp){
+        String str = "";
+        for (Object obj: tQp){
+            str = str + obj.getClass().getCanonicalName() + ":" + obj.toString() + ";\n\n";
+        }
+        Logger.i("Length of linkedList:" + tQp.size());
+        Logger.i("str of linkedList:" + str);
+        printMsg2ExportedActivity(activity, str);
+    }
+    public static void printMap(Activity activity, HashMap tQr){
+        String str = "";
+        for (Object entry: tQr.entrySet()){
+            str = str + entry.getClass().getCanonicalName() + ":" + entry.toString() + ";\n\n";
+        }
+        printMsg2ExportedActivity(activity, str);
+    }
 
 
     public static void printViewTree2ExportedActivity(Activity act, ViewGroup view){

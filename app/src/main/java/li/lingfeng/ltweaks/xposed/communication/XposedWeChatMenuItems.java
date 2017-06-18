@@ -6,6 +6,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
 import de.robv.android.xposed.XC_MethodHook;
 import li.lingfeng.ltweaks.R;
 import li.lingfeng.ltweaks.lib.XposedLoad;
@@ -22,12 +25,18 @@ import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 public class XposedWeChatMenuItems extends XposedBase {
 
     private final static String actTmp15 = "com.tencent.mm.ui.LauncherUI";
+    private final static String HOME_UI = "com.tencent.mm.ui.HomeUI";
     private Activity activity;
     private MenuItem showViewTreeBtn;
     private MenuItem showFindViewTest;
     private MenuItem showFindViewLayout;
     private MenuItem showActivityMethods;
     private MenuItem showActivityFields;
+
+    private MenuItem showFindHomeUI;
+    private MenuItem showFindHomeUIFields;
+    private MenuItem showFindHomeUIFieldsLinkedList;
+    private MenuItem showFindHomeUIFieldsHashMap;
 
     @Override
     protected void handleLoadPackage() throws Throwable {
@@ -54,6 +63,11 @@ public class XposedWeChatMenuItems extends XposedBase {
                 showFindViewLayout = menu.add(Menu.NONE, 1002, 0, "查找 layout");
                 showActivityMethods = menu.add(Menu.NONE, 1003, 0, "显示methods");
                 showActivityFields = menu.add(Menu.NONE, 1004, 0, "显示fields");
+
+                showFindHomeUI = menu.add(Menu.NONE, 1005, 0, "HomeUI methods");
+                showFindHomeUIFields = menu.add(Menu.NONE, 1006, 0, "HomeUI fields");
+                showFindHomeUIFieldsLinkedList = menu.add(Menu.NONE, 1007, 0, "HomeUI fields (LinkedList)");
+                showFindHomeUIFieldsHashMap = menu.add(Menu.NONE, 1008, 0, "HomeUI fields (HashMap)");
 
                 showViewTreeBtn.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
@@ -82,7 +96,7 @@ public class XposedWeChatMenuItems extends XposedBase {
                     // 方法2, 失败, 没找到
                     // View v = YWUtilsForWechat.recursiveLoopChildrenFindType(rootView, "com.tencent.mm.ui.widget.SwipeBackLayout");
                     // 方法3, 失败, 竟然为空
-                    Object v = YWUtilsForWechat.findSwipeBackLayout(activity);
+                    Object v = YWUtilsForWechat.findFieldRef(activity, YWUtilsForWechat.SwipeBackLayout);
                     // 方法4, ...
                     if(null != v) {
                         Logger.toast_i_long(activity, v.toString());
@@ -98,7 +112,44 @@ public class XposedWeChatMenuItems extends XposedBase {
                 if(item == showActivityFields){
                     YWUtilsLogger.printFields2ExportedActivity(activity, null);
                 }
-
+                if(item == showFindHomeUI){
+                    Object v = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    if(null != v) {
+                        YWUtilsLogger.printClassMethods2ExportedActivity(activity, v);
+                        Logger.toast_i_long(activity, v.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found HOME_UI class methods");
+                    }
+                }
+                if(item == showFindHomeUIFields){
+                    Object v = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    if(null != v) {
+                        YWUtilsLogger.printFields2ExportedActivity(activity, v);
+                        Logger.toast_i_long(activity, v.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found HOME_UI fields");
+                    }
+                }
+                if(item == showFindHomeUIFieldsLinkedList){
+                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    LinkedList tQp = (LinkedList) YWUtilsForWechat.findFieldRef(homeUI, "java.util.LinkedList");
+                    if(null != tQp) {
+                        YWUtilsLogger.printLinedList(activity, tQp);
+                        Logger.toast_i_long(activity, tQp.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found HOME_UI fields linkedList");
+                    }
+                }
+                if(item == showFindHomeUIFieldsHashMap){
+                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    HashMap tQr = (HashMap) YWUtilsForWechat.findFieldRef(homeUI, "java.util.HashMap");
+                    if(null != tQr) {
+                        YWUtilsLogger.printMap(activity, tQr);
+                        Logger.toast_i_long(activity, tQr.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found HOME_UI fields hashMap");
+                    }
+                }
 
             }
         });
