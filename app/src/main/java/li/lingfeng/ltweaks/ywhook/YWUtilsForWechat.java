@@ -48,6 +48,7 @@ public class YWUtilsForWechat {
         return null;
     }
     public static String SwipeBackLayout = "com.tencent.mm.ui.widget.SwipeBackLayout";
+    public static String CustomViewPager = "com.tencent.mm.ui.base.CustomViewPager";
     // 并没有找到:
     // com.tencent.mm.ui.widget.SwipeBackLayout
     // 难道它用的是fragments? (如何找到所有的fragments)

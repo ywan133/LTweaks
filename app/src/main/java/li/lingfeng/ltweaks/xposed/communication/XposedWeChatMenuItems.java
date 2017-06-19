@@ -26,17 +26,21 @@ public class XposedWeChatMenuItems extends XposedBase {
 
     private final static String actTmp15 = "com.tencent.mm.ui.LauncherUI";
     private final static String HOME_UI = "com.tencent.mm.ui.HomeUI";
+    private final static String CONVERSATION_VIEW = "com.tencent.mm.ui.conversation.ConversationOverscrollListView";
+
     private Activity activity;
     private MenuItem showViewTreeBtn;
     private MenuItem showFindViewTest;
+
     private MenuItem showFindViewLayout;
+    private MenuItem showFindViewPager;
+    private MenuItem showFindViewPagerFields;
+
     private MenuItem showActivityMethods;
     private MenuItem showActivityFields;
 
     private MenuItem showFindHomeUI;
     private MenuItem showFindHomeUIFields;
-    private MenuItem showFindHomeUIFieldsLinkedList;
-    private MenuItem showFindHomeUIFieldsHashMap;
 
     @Override
     protected void handleLoadPackage() throws Throwable {
@@ -58,16 +62,18 @@ public class XposedWeChatMenuItems extends XposedBase {
                 // Logger.toast_i(activity, "onCreateOptionsMenu, LauncherUI");
                 Menu menu = (Menu) param.args[0];
 
-                showViewTreeBtn = menu.add(Menu.NONE, 1000, 0, "显示View树");
-                showFindViewTest = menu.add(Menu.NONE, 1001, 0, "查找 聪明的我们");
-                showFindViewLayout = menu.add(Menu.NONE, 1002, 0, "查找 layout");
-                showActivityMethods = menu.add(Menu.NONE, 1003, 0, "显示methods");
-                showActivityFields = menu.add(Menu.NONE, 1004, 0, "显示fields");
+                showViewTreeBtn = menu.add(Menu.NONE, 1000, 0, "LauncherUI View树");
+                showFindViewTest = menu.add(Menu.NONE, 1001, 0, "LauncherUI 查找 聪明的我们");
+                showFindViewLayout = menu.add(Menu.NONE, 1002, 0, "LauncherUI 查找 layout");
+
+                showActivityMethods = menu.add(Menu.NONE, 1003, 0, "LauncherUI 显示 methods");
+                showActivityFields = menu.add(Menu.NONE, 1004, 0, "LauncherUI 显示 fields");
 
                 showFindHomeUI = menu.add(Menu.NONE, 1005, 0, "HomeUI methods");
                 showFindHomeUIFields = menu.add(Menu.NONE, 1006, 0, "HomeUI fields");
-                showFindHomeUIFieldsLinkedList = menu.add(Menu.NONE, 1007, 0, "HomeUI fields (LinkedList)");
-                showFindHomeUIFieldsHashMap = menu.add(Menu.NONE, 1008, 0, "HomeUI fields (HashMap)");
+
+                showFindViewPager = menu.add(Menu.NONE, 1007, 0, "showFindViewPager methods");
+                showFindViewPagerFields  = menu.add(Menu.NONE, 1008, 0, "showFindViewPager fields");
 
                 showViewTreeBtn.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
@@ -104,6 +110,27 @@ public class XposedWeChatMenuItems extends XposedBase {
                         Logger.toast_i_long(activity, "not found layout");
                     }
                 }
+                if(item == showFindViewPager){
+                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    Object viewPager = YWUtilsForWechat.findFieldRef(homeUI, YWUtilsForWechat.CustomViewPager);
+                    if(null != viewPager) {
+                        YWUtilsLogger.printClassMethods2ExportedActivity(activity, viewPager);
+                        Logger.toast_i_long(activity, viewPager.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found viewPager (methods)");
+                    }
+                }
+                if(item == showFindViewPagerFields){
+                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
+                    Object viewPager = YWUtilsForWechat.findFieldRef(homeUI, YWUtilsForWechat.CustomViewPager);
+                    if(null != viewPager) {
+                        YWUtilsLogger.printFields2ExportedActivity(activity, viewPager);
+                        Logger.toast_i_long(activity, viewPager.toString());
+                    }else{
+                        Logger.toast_i_long(activity, "not found viewPager (fields)");
+                    }
+                }
+
 
 
                 if(item == showActivityMethods){
@@ -128,26 +155,6 @@ public class XposedWeChatMenuItems extends XposedBase {
                         Logger.toast_i_long(activity, v.toString());
                     }else{
                         Logger.toast_i_long(activity, "not found HOME_UI fields");
-                    }
-                }
-                if(item == showFindHomeUIFieldsLinkedList){
-                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
-                    LinkedList tQp = (LinkedList) YWUtilsForWechat.findFieldRef(homeUI, "java.util.LinkedList");
-                    if(null != tQp) {
-                        YWUtilsLogger.printLinedList(activity, tQp);
-                        Logger.toast_i_long(activity, tQp.toString());
-                    }else{
-                        Logger.toast_i_long(activity, "not found HOME_UI fields linkedList");
-                    }
-                }
-                if(item == showFindHomeUIFieldsHashMap){
-                    Object homeUI = YWUtilsForWechat.findFieldRef(activity, HOME_UI);
-                    HashMap tQr = (HashMap) YWUtilsForWechat.findFieldRef(homeUI, "java.util.HashMap");
-                    if(null != tQr) {
-                        YWUtilsLogger.printMap(activity, tQr);
-                        Logger.toast_i_long(activity, tQr.toString());
-                    }else{
-                        Logger.toast_i_long(activity, "not found HOME_UI fields hashMap");
                     }
                 }
 
@@ -177,6 +184,28 @@ public class XposedWeChatMenuItems extends XposedBase {
             }
         });
 
+        hookAllConstructors(CONVERSATION_VIEW, new XC_MethodHook(){
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                try{
+                    Object conView = param.thisObject;
+                    Object what = param.args[0];
+                    Logger.toast_i(activity, what.toString());
+                }catch (Throwable t){
+                    Logger.stackTrace(t);
+                }
+            }
+        });
+        hookAllMethods(CONVERSATION_VIEW, "onItemClick", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+
+                Object what = param.args[0];
+                YWUtilsLogger.printFields2ExportedActivity(activity, what);
+            }
+        });
 
     }
 }

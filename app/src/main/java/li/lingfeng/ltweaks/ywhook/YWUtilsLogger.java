@@ -128,23 +128,6 @@ public class YWUtilsLogger {
         printMsg2ExportedActivity(act, str);
     }
 
-    public static void printLinedList(Activity activity, LinkedList tQp){
-        String str = "";
-        for (Object obj: tQp){
-            str = str + obj.getClass().getCanonicalName() + ":" + obj.toString() + ";\n\n";
-        }
-        Logger.i("Length of linkedList:" + tQp.size());
-        Logger.i("str of linkedList:" + str);
-        printMsg2ExportedActivity(activity, str);
-    }
-    public static void printMap(Activity activity, HashMap tQr){
-        String str = "";
-        for (Object entry: tQr.entrySet()){
-            str = str + entry.getClass().getCanonicalName() + ":" + entry.toString() + ";\n\n";
-        }
-        printMsg2ExportedActivity(activity, str);
-    }
-
 
     public static void printViewTree2ExportedActivity(Activity act, ViewGroup view){
 
