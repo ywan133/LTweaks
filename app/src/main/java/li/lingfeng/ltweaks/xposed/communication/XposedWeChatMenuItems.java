@@ -202,7 +202,7 @@ public class XposedWeChatMenuItems extends XposedBase {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
 
-                Object what = param.args[0];
+                Object what = param.args[1];
                 YWUtilsLogger.printFields2ExportedActivity(activity, what);
             }
         });

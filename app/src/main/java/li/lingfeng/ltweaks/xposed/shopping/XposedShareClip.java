@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ import li.lingfeng.ltweaks.ywhook.YWUtilsLogger;
 public abstract class XposedShareClip extends XposedBase {
 
     private Activity mActivity;
+    private View 商品View;
+    private View 详情View;
     private boolean mIsSharing = false;
     private String foundProductId = "";
 
@@ -62,17 +65,64 @@ public abstract class XposedShareClip extends XposedBase {
                         Logger.toast_i(mActivity, "id:" + foundProductId);
                     }
                     ViewGroup rootView = (ViewGroup) mActivity.findViewById(android.R.id.content);
-                    YWUtilsForJdPrice.hookALongClickBtn(rootView, foundProductId, mActivity);
+                    商品View = YWUtilsForJdPrice.hookALongClickBtn(rootView, foundProductId, mActivity, 商品View);
+                    详情View = YWUtilsForJdPrice.hookALongClickBtn详情(rootView, foundProductId, mActivity, 详情View);
+                    商品View = null;
+                    详情View = null;
                 }catch (Throwable t){
                     Logger.toast_i(mActivity, "jd-price-history");
                 }
             }
         });
+        findAndHookActivity(getItemActivity(), "refreshView", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                try {
+                    Bundle extra = (Bundle) param.args[1];
+                    if (null != extra ) {
+                        foundProductId = extra.get("id").toString();
+                        Logger.toast_i(mActivity, "id(refreshView):" + foundProductId);
+                    }
+                }catch (Throwable t){
+                    Logger.toast_i(mActivity, "jd-price-history refreshView");
+                }
+            }
+        });
+        findAndHookActivity(getItemActivity(), "onSaveInstanceState", Bundle.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                try {
+                    Bundle extra = (Bundle) param.args[0];
+                    if (null != extra ) {
+                        foundProductId = extra.get("id").toString();
+                        Logger.toast_i(mActivity, "id(onSaveInstanceState):" + foundProductId);
+                    }
+                }catch (Throwable t){
+                    Logger.toast_i(mActivity, "jd-price-history onSaveInstanceState");
+                }
+            }
+        });
+
+        findAndHookActivity(getItemActivity(), "getPageParam", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                Object result = param.getResult();
+                Logger.toast_i(mActivity, "id(getPageParam):" + result);
+            }
+        });
+
         findAndHookActivity(getItemActivity(), "onDestroy", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
+                mActivity = null;
+                商品View = null;
+                详情View = null;
                 YWUtilsForJdPrice.onDestroy();
+                Logger.toast_i(mActivity, "ProductDetailActivity: destory");
             }
         });
 
@@ -80,8 +130,20 @@ public abstract class XposedShareClip extends XposedBase {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 
-                // Logger.toast_i(mActivity, "ProductDetailActivity: stop");
+                Logger.toast_i(mActivity, "ProductDetailActivity: stop");
                 mActivity = null;
+                商品View = null;
+                详情View = null;
+            }
+        });
+        findAndHookActivity(getItemActivity(), "onPause", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+
+                Logger.toast_i(mActivity, "ProductDetailActivity: pause");
+                mActivity = null;
+                商品View = null;
+                详情View = null;
             }
         });
 

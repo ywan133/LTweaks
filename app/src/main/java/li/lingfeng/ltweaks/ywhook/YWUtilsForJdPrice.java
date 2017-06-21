@@ -16,15 +16,14 @@ import org.json.JSONObject;
 public class YWUtilsForJdPrice {
 
 
-    private static String PRODUCT_ID;
-    private static Activity ACTIVITY;
 
-    public static void hookALongClickBtn(ViewGroup rootView, String foundProductId, Activity mActivity){
-
-        PRODUCT_ID = foundProductId;
-        ACTIVITY = mActivity;
-
-        View child = recursiveLoopChildren(rootView);
+    public static View hookALongClickBtn(ViewGroup rootView,
+                                         final String foundProductId,
+                                         final Activity mActivity,
+                                         View child){
+        if(null == child) {
+            child = recursiveLoopChildren(rootView, "商品");
+        }
 
         int redColorValue = Color.RED;
         child.setBackgroundColor(redColorValue);
@@ -36,18 +35,44 @@ public class YWUtilsForJdPrice {
             public boolean onLongClick(View v) {
                 // Logger.toast_i_long(mActivity, "long click");
 
-                YWUtilsForJdPrice.invokeJdPriceHistory(PRODUCT_ID, ACTIVITY);
+                YWUtilsForJdPrice.invokeJdPriceHistory(foundProductId, mActivity);
                 return false;
             }
         });
+        return child;
 
     }
 
-    private static View recursiveLoopChildren(ViewGroup parent) {
+    public static View hookALongClickBtn详情(ViewGroup rootView,
+                                         final String foundProductId,
+                                         final Activity mActivity,
+                                         View child){
+        if(null == child) {
+            child = recursiveLoopChildren(rootView, "详情");
+        }
+
+        int redColorValue = Color.GREEN;
+        child.setBackgroundColor(redColorValue);
+
+        child.setClickable(true);
+        child.setLongClickable(true);
+        child.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                YWUtilsLogger.printClassMethods2ExportedActivity(mActivity, null);
+                return false;
+            }
+        });
+        return child;
+
+    }
+
+    private static View recursiveLoopChildren(ViewGroup parent, String target) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                View foundIt = recursiveLoopChildren((ViewGroup) child);
+                View foundIt = recursiveLoopChildren((ViewGroup) child, target);
                 // DO SOMETHING WITH VIEWGROUP, AFTER CHILDREN HAS BEEN LOOPED
                 if(null != foundIt){
                     return foundIt;
@@ -62,7 +87,7 @@ public class YWUtilsForJdPrice {
 //                                int redColorValue = Color.RED;
 //                                child.setBackgroundColor(redColorValue);
 //                            }
-                    if(title instanceof String && title.equals("商品")){
+                    if(title instanceof String && title.equals(target)){
                         return child;
                     }
 //                            if(title instanceof String && title.equals("评价")){
@@ -98,7 +123,6 @@ public class YWUtilsForJdPrice {
     }
 
     public static void onDestroy() {
-        PRODUCT_ID = null;
-        ACTIVITY = null;
+
     }
 }

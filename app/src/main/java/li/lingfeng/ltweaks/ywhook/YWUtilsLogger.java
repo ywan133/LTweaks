@@ -59,9 +59,13 @@ public class YWUtilsLogger {
             target = act;
         }
         Method[] methods = target.getClass().getDeclaredMethods();
-        String str = "";
-        for(Method f:methods){
-            str = str + f.getName() + ";";
+        String str = "---" + target.getClass().getCanonicalName() + "---\n\n\n";
+        for(Method m:methods){
+            String _paramsClass = "";
+            for(Class c : m.getParameterTypes()){
+                _paramsClass += c.getSimpleName() + "|";
+            }
+            str = str + m.getName() + ";\n  " + _paramsClass + "\n\n\n";
         }
         // after serializing, we start it
         printMsg2ExportedActivity(act, str);
@@ -72,7 +76,7 @@ public class YWUtilsLogger {
             target = act;
         }
         Field[] fields = target.getClass().getDeclaredFields();
-        String str = "";
+        String str = "---" + target.getClass().getCanonicalName() + "---\n\n\n";
         for(Field f:fields){
             // com.tencent.mm.ui.HomeUI:tRc;
             // boolean:tRf;
